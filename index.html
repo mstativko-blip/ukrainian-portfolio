@@ -193,32 +193,51 @@
 
   <div class="container">
 
-    <!-- 01: Обкладинка -->
-    <section class="hero">
-      <div class="hero-subtitle">Сценарист, режисер, креативник</div>
-      <h1 class="hero-title">MAX<br>STATIVKO</h1>
-      <p style="max-width: 400px; opacity: 0.9;">Створюю історії, що лишають слід. А колись – змінять світ.</p>
-    </section>
-
-    <!-- 02: Одним словом (Фото) -->
+<!-- Блок: Повне портфоліо (PDF / Документ) -->
     <section class="case-card">
       <div class="case-content">
-        <h2>Одним словом</h2>
-        <p>Привіт, я Макс Статівко.</p>
-        <p>Я створюю концепції, пишу сценарії, знімаю, монтую, керую командами та роблю цікаві штуки з характером.</p>
-        <p>Від постів у соцмережах до рекламних роликів.<br>Від AI-3D до вайб-кодингу інструментів інтерактивної візуалізації.</p>
+        <h2>Повне портфоліо</h2>
+        <div class="category">Архів проєктів та презентація</div>
+        <p>Зібрані разом ключові роботи, креативні концепції та візуальні кейси в єдиному документі.</p>
+        <p>Тут можна погортати детальний опис проєктів у зручному форматі.</p>
+        <button onclick="openPortfolioModal()" class="btn" style="cursor: pointer; border: none; margin-top: 15px;">ПОРТФОЛІО (PDF) &rarr;</button>
       </div>
-      <div class="mockup-container">
-        <div class="tablet-frame">
-          <div class="tablet-screen">
-            <!-- Тут згодом буде фото чи картинка -->
-            <span>[ Фото / Мокап ]</span>
-          </div>
+      <div class="mockup-container" style="display: flex; align-items: center; justify-content: center;">
+        <div onclick="openPortfolioModal()" style="cursor: pointer; width: 100%; max-width: 420px; aspect-ratio: 4/3; background: #1a1a1a; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+          <svg style="width: 48px; height: 48px; fill: #ff4d4d; margin-bottom: 12px;" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+          <span style="color: #fff; font-weight: 600; font-size: 16px;">Відкрити повне портфоліо</span>
+          <span style="color: #888; font-size: 13px; margin-top: 5px;">Натисніть для перегляду</span>
         </div>
       </div>
     </section>
 
-    <!-- 03: Vector3 -->
+    <!-- Поп-ап вікно для повного портфоліо -->
+    <div id="portfolioModal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; padding: 20px;">
+      <div style="position: relative; width: 100%; max-width: 1100px; height: 85vh; background: #111; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
+        <button onclick="closePortfolioModal()" style="position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.2); color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 22px; cursor: pointer; z-index: 10000; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">&times;</button>
+        <iframe src="https://drive.google.com/file/d/1rs0SnLcW8-F8Ml5-AbFYeb--AsGO5UsO/preview" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>
+      </div>
+    </div>
+
+    <script>
+      function openPortfolioModal() {
+        document.getElementById('portfolioModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+      function closePortfolioModal() {
+        document.getElementById('portfolioModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+      // Закриття по кліку за межами вікна
+      window.addEventListener('click', function(event) {
+        var modal = document.getElementById('portfolioModal');
+        if (event.target == modal) {
+          closePortfolioModal();
+        }
+      });
+    </script>
+
+  <!-- 03: Vector3 -->
     <section class="case-card">
       <div class="case-content">
         <h2>Vector3 – Бабілонська вежа</h2>
@@ -227,15 +246,18 @@
         <p>В мене збереглася французька версія цієї роботи.</p>
       </div>
       <div class="mockup-container">
-        <div class="tablet-frame">
-          <div class="tablet-screen">
-            <span>[ Відео / Плеєр ]</span>
-          </div>
+        <div style="width: 100%; max-width: 480px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+          <iframe 
+            src="https://drive.google.com/file/d/1-B7lGSEQbq_kxay-sbadwcaELZ8wxGul/preview" 
+            allow="autoplay" 
+            allowfullscreen
+            style="width: 100%; aspect-ratio: 16/9; border: none; display: block;">
+          </iframe>
         </div>
       </div>
     </section>
 
-    <!-- 04: Crypto-Karatist -->
+<!-- 04: Crypto-Karatist -->
     <section class="case-card">
       <div class="case-content">
         <h2>Crypto-Karatist</h2>
@@ -244,15 +266,18 @@
         <p>Саунд-дизайн тут я робив власноруч. Чому? А це подкаст, тут звук важливий.</p>
       </div>
       <div class="mockup-container">
-        <div class="tablet-frame">
-          <div class="tablet-screen">
-            <span>[ Відео / YouTube ]</span>
-          </div>
+        <div style="width: 100%; max-width: 480px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+          <iframe 
+            src="https://drive.google.com/file/d/1t0lxGSqdZLwghu4wp8CcUgK8QZVqUrOR/preview" 
+            allow="autoplay" 
+            allowfullscreen
+            style="width: 100%; aspect-ratio: 16/9; border: none; display: block;">
+          </iframe>
         </div>
       </div>
     </section>
 
-    <!-- 05: EVE -->
+<!-- 05: EVE -->
     <section class="case-card">
       <div class="case-content">
         <h2>EVE – Едемський сад</h2>
@@ -262,14 +287,19 @@
       </div>
       <div class="mockup-container">
         <div class="phone-frame">
-          <div class="phone-screen">
-            <span>[ Вертикальне відео ]</span>
+          <div class="phone-screen" style="background: #000; display: block;">
+            <iframe 
+              src="https://drive.google.com/file/d/1fEMh5vk39gKGag1orr1rYUZINC-Gq9YD/preview" 
+              allow="autoplay" 
+              allowfullscreen
+              style="width: 100%; height: 100%; border: none; display: block; aspect-ratio: 9/19;">
+            </iframe>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 06: Затишний Шекель -->
+<!-- 06: Затишний Шекель -->
     <section class="case-card">
       <div class="case-content">
         <h2>Затишний Шекель</h2>
@@ -279,47 +309,51 @@
       </div>
       <div class="mockup-container">
         <div class="phone-frame">
-          <div class="phone-screen">
-            <span>[ Екран Telegram ]</span>
+          <div class="phone-screen" style="background: #000; display: block;">
+            <img src="https://lh3.googleusercontent.com/d/1Sbpb7hosO0fyZI1nAb-wr_fTu1UhuzXU" alt="Затишний Шекель" style="width: 100%; height: 100%; object-fit: cover; display: block;">
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 07: 3D-візуалізація -->
+<!-- 07: 3D-візуалізація Lumen -->
     <section class="case-card">
       <div class="case-content">
-        <h2>Виглядати дорого</h2>
+        <h2>Сироватка Lumen</h2>
         <div class="category">Фотореалістична 3D-візуалізація</div>
-        <p>А тут у нас мінімалістична композиція мильно-риُльнyх принад — а я навіть не знаю толком, що воно все таке.</p>
-        <p>Зроблено в Blender. Текстуровано, деталізовано та відрендерено з прозорим фоном спеціально для цієї презентації.</p>
+        <p>Чисте скло, плавні переливи світла та міліметрова точність у кожній деталі.</p>
+        <p>Цю скляночку сироватки я відрендерив у Blender: налаштував складні матеріали скла, рефлекси та прозорість. Ця робота надзвичайно затягує.</p>
       </div>
       <div class="mockup-container">
-        <div class="tablet-frame">
-          <div class="tablet-screen">
-            <span>[ 3D Рендер / Картинка ]</span>
-          </div>
+        <div style="width: 100%; max-width: 420px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15); background: #fff; padding: 15px;">
+          <img src="https://lh3.googleusercontent.com/d/19Pk3fuvfJTZSpzD9wcIZdyG6s-7kFLZL" alt="Сироватка Lumen 3D" style="width: 100%; height: auto; display: block; border-radius: 8px;">
         </div>
       </div>
     </section>
 
-    <!-- 08: VAU-BOO -->
+<!-- 08: VAU-BOO -->
     <section class="case-card">
       <div class="case-content">
         <h2>Vau-Boo: історія навпаки</h2>
         <div class="category">Рекламний ролик (Live Action)</div>
+        <p>Повернемось до відео ще на хвилину-п'ятдесят.</p>
         <p>Це класичний американський відеос-реклама бренду. І тим дивовижніше, що знято, змонтовано та виготовлено його в Харкові.</p>
+        <p>Так, там є такі актори. І так, там є такі локації.</p>
       </div>
       <div class="mockup-container">
-        <div class="tablet-frame">
-          <div class="tablet-screen">
-            <span>[ Відео ролик ]</span>
-          </div>
+        <div style="width: 100%; max-width: 480px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+          <iframe 
+            src="https://www.youtube.com/embed/MxU9Ft-cKwk" 
+            title="Vau-Boo video player" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen
+            style="width: 100%; aspect-ratio: 16/9; border: none; display: block;">
+          </iframe>
         </div>
       </div>
     </section>
 
-    <!-- 09: BIZOL -->
+<!-- 09: BIZOL -->
     <section class="case-card">
       <div class="case-content">
         <h2>Bizol: корпоративне відео</h2>
@@ -328,61 +362,142 @@
         <p>Знімали в Німеччині, говорили та писали українською, але тут я для різноманітності даю іспанську мовну версію.</p>
       </div>
       <div class="mockup-container">
-        <div class="tablet-frame">
-          <div class="tablet-screen">
-            <span>[ Corporate Video ]</span>
-          </div>
+        <div style="width: 100%; max-width: 480px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+          <iframe 
+            src="https://www.youtube.com/embed/ma9-HzdUysI" 
+            title="Bizol video player" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen
+            style="width: 100%; aspect-ratio: 16/9; border: none; display: block;">
+          </iframe>
         </div>
       </div>
     </section>
 
-    <!-- 10: 3D-Конфігуратор -->
+<!-- 10: 3D-Конфігуратор -->
     <section class="case-card">
       <div class="case-content">
-        <h2>3D-Конфігуратор</h2>
+        <h2>3D-Конфігуратор: бренд, який можна приміряти</h2>
         <div class="category">Інтерактивний інструмент кастомізації мерчу</div>
         <p>Програма без програміста. Gemini + Blender + трохи часу = 3d-кастомайзер.</p>
-        <p>Обраний товар можна налаштувати, вибрати колір, додати принт, видалити фон та відправити у корзину.</p>
-        <a href="https://mstativko-blip.github.io/Open/" target="_blank" class="btn">СПРОБУАТИ &rarr;</a>
+        <p>Обраний товар можна налаштувати, вибрати колір, додати принт, видалити фон та відправити свій унікальний товар в корзину з усіма атрибутами.</p>
+        <button onclick="openConfiguratorModal()" class="btn" style="cursor: pointer; border: none;">СПРОБУАТИ &rarr;</button>
       </div>
       <div class="mockup-container">
-        <div class="laptop-frame">
-          <div class="laptop-screen">
-            <span>[ WebGL / Ноут мокап ]</span>
+        <div class="laptop-frame" onclick="openConfiguratorModal()" style="cursor: pointer;">
+          <div class="laptop-screen" style="background: #000; display: block; aspect-ratio: 16/10; position: relative;">
+            <iframe 
+              src="https://drive.google.com/file/d/1All_Q6aO2_f11j3KnD9_W6mQNRl-HEZU/preview" 
+              allow="autoplay" 
+              style="width: 100%; height: 100%; border: none; display: block; pointer-events: none;">
+            </iframe>
+            <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; transition: background 0.3s;" onmouseover="this.style.background='rgba(0,0,0,0)'" onmouseout="this.style.background='rgba(0,0,0,0.1)'">
+              <span style="background: rgba(0,0,0,0.7); color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 500;">Натисніть, щоб відкрити</span>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 11: Катерина Ломоносов -->
+    <!-- Поп-ап вікно конфігуратора -->
+    <div id="configuratorModal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; padding: 20px;">
+      <div style="position: relative; width: 100%; max-width: 1100px; height: 85vh; background: #111; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
+        <button onclick="closeConfiguratorModal()" style="position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.2); color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 22px; cursor: pointer; z-index: 10000; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">&times;</button>
+        <iframe src="https://mstativko-blip.github.io/models/" style="width: 100%; height: 100%; border: none;"></iframe>
+      </div>
+    </div>
+
+    <script>
+      function openConfiguratorModal() {
+        document.getElementById('configuratorModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+      function closeConfiguratorModal() {
+        document.getElementById('configuratorModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+      // Закриття по кліку поза вікном
+      window.onclick = function(event) {
+        var modal = document.getElementById('configuratorModal');
+        if (event.target == modal) {
+          closeConfiguratorModal();
+        }
+      }
+    </script>
+
+<!-- 11: Катерина Ломоносов -->
     <section class="case-card">
       <div class="case-content">
-        <h2>Фінансовий експерт та її унікальний голос</h2>
-        <div class="category">Дизайн та верстка сайту</div>
-        <p>Катерина веде своїх клієнтів місяцями, дехто – роками. Вона має власний впізнаваний голос і специфічний вайб.</p>
-        <p>Ми почали з розробки дизайну в Figma, а потім зверстали все на WIX.</p>
+        <h2>Катерина Ломоносов</h2>
+        <div class="category">Фінансовий консалтинг | Сайт та позиціонування</div>
+        <p>Повний редизайн цифровізації фінансового радника: від архітектури сайту до візуальної айдентики та текстів.</p>
+        <p>Проєкт, де дизайн і структура працюють на довіру з першої секунди та чітко конвертують відвідувачів у клієнтів.</p>
+        <button onclick="openLomonosovModal()" class="btn" style="cursor: pointer; border: none;">ПЕРЕГЛЯНУТИ САЙТ &rarr;</button>
       </div>
-      <div class="mockup-container">
-        <div class="laptop-frame">
-          <div class="laptop-screen">
-            <span>[ Скриншот сайту ]</span>
+      <div class="mockup-container" style="display: flex; gap: 15px; align-items: center; justify-content: center; flex-wrap: wrap;">
+        <!-- Ноутбук -->
+        <div class="laptop-frame" onclick="openLomonosovModal()" style="cursor: pointer; flex: 1; min-width: 260px; max-width: 320px;">
+          <div class="laptop-screen" style="background: #000; display: block; aspect-ratio: 16/10; position: relative;">
+            <img src="https://lh3.googleusercontent.com/d/1aDsQVSgN_MdcvujE-5comQHEVpH8p5cQ" alt="Lomonosov Desktop" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+          </div>
+        </div>
+        <!-- Телефон -->
+        <div class="phone-frame" onclick="openLomonosovModal()" style="cursor: pointer; width: 130px; flex-shrink: 0;">
+          <div class="phone-screen" style="background: #000; display: block; aspect-ratio: 9/19;">
+            <img src="https://lh3.googleusercontent.com/d/1h-Gj-lXkoqAz4Lec0VOr5LKF5muggk4c" alt="Lomonosov Mobile" style="width: 100%; height: 100%; object-fit: cover; display: block;">
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 12: Tushnitsa -->
+    <!-- Поп-ап вікно для сайту Катерини Ломоносов -->
+    <div id="lomonosovModal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; padding: 20px;">
+      <div style="position: relative; width: 100%; max-width: 1100px; height: 85vh; background: #111; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
+        <button onclick="closeLomonosovModal()" style="position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.2); color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 22px; cursor: pointer; z-index: 10000; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">&times;</button>
+        <iframe src="https://www.lomonosov-finance.com/" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>
+      </div>
+    </div>
+
+    <script>
+      function openLomonosovModal() {
+        document.getElementById('lomonosovModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+      function closeLomonosovModal() {
+        document.getElementById('lomonosovModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+      // Розширення для закриття по кліку поза вікном
+      window.addEventListener('click', function(event) {
+        var modal = document.getElementById('lomonosovModal');
+        if (event.target == modal) {
+          closeLomonosovModal();
+        }
+      });
+    </script>
+
+<!-- 12: Android-суфлер Tushnitsa -->
     <section class="case-card">
       <div class="case-content">
-        <h2>Tushnitsa</h2>
-        <div class="category">Мій особистий Android-суфлер</div>
-        <p>Зробили власний суфлер, простенький, але класний за функціоналом – і жодної реклами!</p>
-        <p>А назвав я його на честь своєї кішки – Тушніца :)</p>
+        <h2>Android-суфлер Tushnitsa</h2>
+        <div class="category">Кастомна мобільна розробка | Android Studio</div>
+        <p>Коли під рукою немає зручного інструмента для запису відео з плаваючим текстом, розробляєш його сам.</p>
+        <p>Створив додаток для Android у Android Studio: плаваючі елементи управління, жести для регулювання швидкості та повний контроль над процесом зйомки без зайвих зусиль.</p>
       </div>
-      <div class="mockup-container">
-        <div class="phone-frame">
-          <div class="phone-screen">
-            <span>[ Android додаток ]</span>
+      <div class="mockup-container" style="display: flex; gap: 20px; align-items: center; justify-content: center; flex-wrap: wrap;">
+        <!-- Картинка/Скриншот у комп'ютерному вигляді або плашці -->
+        <div style="flex: 1; min-width: 260px; max-width: 300px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+          <img src="https://lh3.googleusercontent.com/d/1luCAgZB83xi27urHnUrrI8HORJc565Bb" alt="Tushnitsa Preview" style="width: 100%; height: auto; display: block;">
+        </div>
+        <!-- Відео роботи у мобільному каркасі -->
+        <div class="phone-frame" style="width: 140px; flex-shrink: 0;">
+          <div class="phone-screen" style="background: #000; display: block; aspect-ratio: 9/19;">
+            <iframe 
+              src="https://drive.google.com/file/d/1oNvfmIL5rL1OQHOcH6ZoAUrq4E7bJi-G/preview" 
+              allow="autoplay" 
+              allowfullscreen
+              style="width: 100%; height: 100%; border: none; display: block;">
+            </iframe>
           </div>
         </div>
       </div>
