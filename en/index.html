@@ -1,1 +1,808 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAX STATIVKO — Портфоліо</title>
+    <!-- Open Graph / Social Media Preview Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mstativko-blip.github.io/ukrainian-portfolio/">
+    <meta property="og:title" content="Макс Статівко — Сценарист, режисер, креативник">
+    <meta property="og:description" content="Створюю історії, що лишають слід. Портфоліо проєктів: відео, 3D, дизайн та мобільна розробка.">
+    <meta property="og:image" content="https://drive.google.com/thumbnail?id=1BUTnWsO1o5gicD3x2vNnSISp6_asI9e1&sz=w1200">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://mstativko-blip.github.io/ukrainian-portfolio/">
+    <meta name="twitter:title" content="Макс Статівко — Сценарист, режисер, креативник">
+    <meta name="twitter:description" content="Створюю історії, що лишають слід. Портфоліо проєктів: відео, 3D, дизайн та мобільна розробка.">
+    <meta name="twitter:image" content="https://drive.google.com/thumbnail?id=1BUTnWsO1o5gicD3x2vNnSISp6_asI9e1&sz=w1200">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-smoky: #f0f2f5;
+            --brand-red: #ff4a4a;
+            --charcoal: #22252a;
+            --paper-bg: #fcfbf9;
+            --paper-shadow: 0 10px 30px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.04);
+            --line-color: rgba(34, 37, 42, 0.08);
+            --line-red: rgba(255, 74, 74, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-smoky);
+            color: var(--charcoal);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Загальний паралакс-фон із лініями */
+        .parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: -1;
+            background-image: 
+                linear-gradient(var(--line-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--line-color) 1px, transparent 1px),
+                linear-gradient(var(--line-red) 1px, transparent 1px);
+            background-size: 80px 80px, 80px 80px, 400px 400px;
+            background-position: -1px -1px;
+            will-change: transform;
+        }
+
+        /* Хедер 100% width */
+        .hero-header {
+            width: 100%;
+            background-color: var(--brand-red);
+            color: var(--charcoal);
+            padding: 80px 5% 100px 5%;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .hero-top-text {
+            align-self: flex-end;
+            text-align: right;
+            max-width: 450px;
+            margin-bottom: 40px;
+        }
+
+        .hero-top-text h3 {
+            font-size: 1.2rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .hero-top-text p {
+            font-size: 1.05rem;
+            opacity: 0.85;
+            font-style: italic;
+        }
+
+        .hero-title {
+            font-size: clamp(3.5rem, 11vw, 9.5rem);
+            font-weight: 900;
+            line-height: 0.88;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+        }
+
+        /* Основна контейнерна сітка */
+        .container {
+            max-width: 1100px;
+            margin: -40px auto 80px auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Паперові картки блоків */
+        .paper-card {
+            background-color: var(--paper-bg);
+            border-radius: 8px;
+            padding: 45px;
+            margin-bottom: 50px;
+            box-shadow: var(--paper-shadow);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .paper-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08), 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-full-width {
+            grid-template-columns: 1fr;
+        }
+
+        .card-info h2 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 1.2;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+
+        .card-info .subtitle {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 22px;
+            font-weight: 700;
+        }
+
+        .card-info p {
+            font-size: 1.02rem;
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .card-info p:last-of-type {
+            margin-bottom: 0;
+        }
+
+        /* Стилі кнопок */
+        .btn {
+            display: inline-block;
+            background-color: var(--charcoal);
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            margin-top: 22px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--brand-red);
+            color: var(--charcoal);
+            transform: translateY(-2px);
+        }
+
+        /* Медіаконтейнери та мокапи */
+        .media-container {
+            width: 100%;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .video-responsive {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 6px;
+        }
+
+        .video-responsive iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        /* Мобільний мокап */
+        .phone-mockup-wrapper {
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-mockup {
+            width: 280px;
+            height: 570px;
+            background: #000;
+            border-radius: 36px;
+            padding: 10px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            border: 4px solid #333;
+            position: relative;
+        }
+
+        .phone-mockup iframe {
+            width: 100%;
+            height: 100%;
+            border-radius: 26px;
+            border: none;
+        }
+
+        /* Двоповерховий мокап ноутбука + смартфона */
+        .laptop-phone-composition {
+            position: relative;
+            width: 100%;
+            padding-bottom: 20px;
+        }
+
+        .laptop-mockup {
+            width: 85%;
+            background: #222;
+            border-radius: 10px 10px 0 0;
+            padding: 10px 10px 0 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .laptop-screen {
+            width: 100%;
+            aspect-ratio: 16/10;
+            object-fit: cover;
+            border-radius: 4px 4px 0 0;
+            display: block;
+        }
+
+        .laptop-base {
+            width: 95%;
+            height: 12px;
+            background: #a0a0a0;
+            border-radius: 0 0 10px 10px;
+            margin: 0 auto;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .phone-overlay {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 32%;
+            background: #000;
+            border-radius: 24px;
+            padding: 6px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border: 2px solid #444;
+        }
+
+        .phone-overlay img {
+            width: 100%;
+            aspect-ratio: 9/19;
+            object-fit: cover;
+            border-radius: 18px;
+            display: block;
+        }
+
+        /* Слайдер-галерея для 3D */
+        .slider-wrapper {
+            position: relative;
+            width: 100%;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .slider-slides {
+            display: flex;
+            transition: transform 0.4s ease-in-out;
+        }
+
+        .slider-slide {
+            min-width: 100%;
+            box-sizing: border-border-box;
+        }
+
+        .slider-slide img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 6px;
+        }
+
+        .slider-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(34, 37, 42, 0.7);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: background 0.2s;
+            z-index: 10;
+        }
+
+        .slider-btn:hover {
+            background: var(--brand-red);
+            color: var(--charcoal);
+        }
+
+        .slider-prev { left: 10px; }
+        .slider-next { right: 10px; }
+
+        /* Повідомлення та Поп-апи */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: #fff;
+            width: 100%;
+            max-width: 900px;
+            height: 85vh;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+            color: #333;
+            line-height: 1;
+        }
+
+        .modal iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Фото автора */
+        .author-photo {
+            width: 100%;
+            max-width: 320px;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Дві мобілки для Android Studio */
+        .double-phone-wrapper {
+            position: relative;
+            width: 100%;
+            height: 380px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .phone-back {
+            position: absolute;
+            width: 180px;
+            left: 15%;
+            top: 10px;
+            background: #000;
+            border-radius: 20px;
+            padding: 5px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border: 2px solid #444;
+            transform: rotate(-6deg);
+        }
+
+        .phone-front {
+            position: absolute;
+            width: 190px;
+            right: 15%;
+            bottom: 10px;
+            background: #000;
+            border-radius: 20px;
+            padding: 5px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            border: 2px solid #555;
+            transform: rotate(4deg);
+            z-index: 2;
+        }
+
+        .phone-back img, .phone-front img {
+            width: 100%;
+            border-radius: 16px;
+            display: block;
+        }
+
+        /* Футер 100% width */
+        .hero-footer {
+            width: 100%;
+            background-color: var(--brand-red);
+            color: var(--charcoal);
+            padding: 80px 5%;
+            margin-top: 100px;
+        }
+
+        .footer-content {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .footer-title {
+            font-size: clamp(2.5rem, 6vw, 5.5rem);
+            font-weight: 900;
+            line-height: 0.95;
+            text-transform: uppercase;
+            margin-bottom: 50px;
+            letter-spacing: -1px;
+        }
+
+        .footer-contacts p {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .footer-contacts a {
+            color: var(--charcoal);
+            text-decoration: none;
+            border-bottom: 2px solid var(--charcoal);
+        }
+
+        .footer-location {
+            margin-top: 30px;
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        /* Адаптивність */
+        @media (max-width: 850px) {
+            .paper-card {
+                grid-template-columns: 1fr;
+                padding: 30px;
+                gap: 25px;
+            }
+
+            .hero-top-text {
+                text-align: left;
+                align-self: flex-start;
+            }
+
+            .phone-overlay {
+                width: 40%;
+            }
+
+            .double-phone-wrapper {
+                height: 320px;
+            }
+            .phone-back { left: 5%; width: 150px; }
+            .phone-front { right: 5%; width: 160px; }
+        }
+    </style>
+</head>
+<body>
+<!-- Перемикач мов у шапці (English) -->
+    <div class="lang-switcher" style="position: absolute; top: 20px; right: 20px; z-index: 100; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 1px;">
+        <a href="../" style="text-decoration: none; color: inherit; opacity: 0.5; transition: opacity 0.2s;">UA</a> | 
+        <span style="opacity: 1.0; border-bottom: 2px solid currentColor; padding-bottom: 2px;">EN</span> | 
+        <a href="../it/" style="text-decoration: none; color: inherit; opacity: 0.5; transition: opacity 0.2s;">IT</a>
+    </div>
+    <!-- Фон з лініями -->
+    <div class="parallax-bg" id="parallaxBg"></div>
+
+    <!-- 1. ХЕДЕР (100% width) -->
+    <header class="hero-header">
+        <div class="hero-content">
+            <div class="hero-top-text">
+                <h3>SCREENWRITER, DIRECTOR, CREATIVE STRATEGIST</h3>
+                <p>Creating stories that leave a mark. And someday – change the world.</p>
+            </div>
+            <h1 class="hero-title">MAX<br>STATIVKO</h1>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- 2. БЛОК 01: ОДНИМ СЛОВОМ (Знайомство) -->
+    <section class="paper-card">
+            <div class="card-info">
+                <h2>LONG STORY SHORT</h2>
+                <div class="subtitle">Hi, I'm Max Stativko</div>
+                <p>I create concepts, write scripts, direct, edit, lead teams, and build cool things with character. From social media posts to commercials. From AI-3D to vibe-coding interactive visualization tools.</p>
+                <p>This site is a showcase of some of my work.</p>
+                <button class="btn" onclick="openModal('resumeModal')">CV</button>
+            </div>
+            <div>
+                <img src="https://drive.google.com/thumbnail?id=1C6bk1pV-4zzBDnaGODLGQKOXn0gGHr7I&sz=w1000" alt="Макс Статівко" class="author-photo">
+            </div>
+        </section>
+        
+        <!-- 3. БЛОК 02: VAU-BOO (Постановний ролик) -->
+     <section class="paper-card">
+            <div class="card-info">
+                <h2>COMMERCIAL VIDEO</h2>
+                <div class="subtitle">Vau-Boo: історія навпаки</div>
+                <p>This is a classic commercial about an auction where sellers compete for a single buyer. A simple story, but look how well it's executed!</p>
+            </div>
+            <div class="media-container">
+                <div class="video-responsive">
+                    <iframe src="https://www.youtube.com/embed/MxU9Ft-cKwk" title="Vau-Boo" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. БЛОК 03: BIZOL (Іміджеве відео) -->
+        <section class="paper-card">
+            <div class="card-info">
+                <h2>BRAND IMAGE VIDEO</h2>
+                <div class="subtitle">A large-scale production work for the German brand Bizol</div>
+                <p>This project for an international manufacturer of lubricants and fuel additives was written in Ukrainian, shot in German, but for you, I've prepared the Spanish version – it sounds the best.</p>
+            </div>
+            <div class="media-container">
+                <div class="video-responsive">
+                    <iframe src="https://www.youtube.com/embed/ma9-HzdUysI" title="Bizol Video" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. БЛОК 04: VECTOR3 (2D-анімація) -->
+        <section class="paper-card">
+            <div class="card-info">
+                <h2>2D ANIMATION COMMERCIAL</h2>
+                <div class="subtitle">Vector3 – The Tower of Babel</div>
+                <p>ТFor three years of my life, I worked as a screenwriter and later as a director at an advertising animation studio, so I've made several hundred such videos. But this particular project required a metaphor that would be universally understood so the video could be translated into seven languages.</p>
+                <p> For you today – French.</p>
+            </div>
+            <div class="media-container">
+                <div class="video-responsive">
+                    <iframe src="https://www.youtube.com/embed/2jlMZD3bwck" title="Vector3 2D Animation" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. БЛОК 05: CRYPTO-KARATIST (YouTube-заставка) -->
+        <section class="paper-card">
+            <div class="card-info">
+                <h2>YOUTUBE CHANNEL INTRO</h2>
+                <div class="subtitle">Crypto-Karatist</div>
+                <p>A task of harmony and balance: we needed to set the right mood, hit the style, but without overdoing it.</p>
+                <p>СI did the sound design here myself. Why? Because this is a podcast, and sound matters here.</p>
+            </div>
+            <div class="media-container">
+                <div class="video-responsive">
+                    <iframe src="https://www.youtube.com/embed/oHlC3VXjtBk" title="Crypto Karatist Opener" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. БЛОК 06: ШІ-ВІДЕО (Vertical Drama) -->
+        <section class="paper-card">
+            <div class="card-info">
+                <h2>AI VIDEO</h2>
+                <div class="subtitle">Vertical Drama DIY</div>
+                <p>The next item is a custom pilot episode of a vertical drama.</p>
+                <p>I adapted the script, generated scenes in higgsfield.ai, voices in 11labs, and edited the whole thing in DaVinci Resolve.</p>
+            </div>
+            <div class="phone-mockup-wrapper">
+                <div class="phone-mockup">
+                    <iframe src="https://www.youtube.com/embed/i4VjwzADcE4" title="AI Vertical Drama" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. БЛОК 07: ЗАТИШНИЙ ШЕКЕЛЬ (Медіа) -->
+       <section class="paper-card">
+            <div class="card-info">
+                <h2>MEDIA DEVELOPMENT FROM SCRATCH</h2>
+                <div class="subtitle">Telegram Channel "Cozy Shekel"</div>
+                <p>Moved to Israel, don't know Hebrew, but want to figure out your finances to learn how to live here?</p>
+                <p>In 2024, we created the Telegram channel "Cozy Shekel" just for you – for over 11,000 channel subscribers.</p>
+                <p>What started as an idea in the head became a well-known brand of financial education in Israel – featuring regular breakdown posts and tips, live streams with invited guests, online and offline seminars.</p>
+                <a href="https://t.me/cozy_shekel" target="_blank" class="btn">VIEW CHANNEL →</a>
+            </div>
+            <div class="phone-mockup-wrapper">
+                <div class="phone-mockup">
+                    <img src="https://drive.google.com/thumbnail?id=1Sbpb7hosO0fyZI1nAb-wr_fTu1UhuzXU&sz=w1000" alt="Затишний Шекель" style="width: 100%; height: 100%; object-fit: cover; border-radius: 26px; display: block;">
+                </div>
+            </div>
+        </section>
+
+        <!-- 9. БЛОК 08: КАТЕРИНА ЛОМОНОСОВ (Сайт) -->
+        <section class="paper-card">
+            <div class="card-info">
+                <h2>WEBSITE FOR A FINANCIAL EXPERT</h2>
+                <div class="subtitle">Design and development of Kateryna Lomonosov’s website</div>
+                <p>I ran Kateryna's Telegram for a year, for a whole year we talked on the phone for exactly one hour every two weeks and did a lot of interesting things together.</p>
+                <p>But our brightest joint creation is her website. I tried to convey the special feeling of interacting with her — both professional and human. Therefore, the website design is mine, the layout is mine, all elements are mine, and all texts are written by me. Visit and browse around — it was all done with incredible кайф (pure joy).</p>
+                <a href="#" class="btn">VIEW WEBSITE →</a>
+            </div>
+            <div class="laptop-phone-composition">
+                <div class="laptop-mockup">
+                    <img src="https://drive.google.com/thumbnail?id=1aDsQVSgN_MdcvujE-5comQHEVpH8p5cQ&sz=w1000" alt="Ноутбук версія" class="laptop-screen">
+                </div>
+                <div class="laptop-base"></div>
+                <div class="phone-overlay">
+                    <img src="https://drive.google.com/thumbnail?id=1h-Gj-lXkoqAz4Lec0VOr5LKF5muggk4c&sz=w1000" alt="Мобільна версія">
+                </div>
+            </div>
+        </section>
+
+        <!-- 10. БЛОК 09: LUMEN (3D Галерея) -->
+       <section class="paper-card">
+            <div class="card-info">
+                <h2>3D VISUALIZATION</h2>
+                <div class="subtitle">Photorealistic 3D visualization of Lumen serum</div>
+                <p>And this is the kind of thing I just love doing. I learned how to use Blender relatively recently, but I already have solid results and continue learning new things.</p>
+                <p>3D modeling is, at the very least, a wonderful hobby. Though there is plenty of room to put it to practical use as well (see below).</p>
+            </div>
+            <div class="slider-wrapper">
+                <button class="slider-btn slider-prev" onclick="moveSlide(-1)">&#10094;</button>
+                <div class="slider-slides" id="lumenSlider">
+                    <div class="slider-slide"><img src="https://drive.google.com/thumbnail?id=1epd6FmuPFm35dHfolwWpuu-FV0LTiuqx&sz=w1000" alt="Lumen Render 1"></div>
+                    <div class="slider-slide"><img src="https://drive.google.com/thumbnail?id=19Pk3fuvfJTZSpzD9wcIZdyG6s-7kFLZL&sz=w1000" alt="Lumen Render 2"></div>
+                    <div class="slider-slide"><img src="https://drive.google.com/thumbnail?id=1PfXXjlD3W4OaGgI4CnAeT6WOx0dZyaO_&sz=w1000" alt="Lumen Render 3"></div>
+                    <div class="slider-slide"><img src="https://drive.google.com/thumbnail?id=1ZXgEV2vcugsbkdl7MomKjzPQ85PrsE_9&sz=w1000" alt="Lumen Render 4"></div>
+                    <div class="slider-slide"><img src="https://drive.google.com/thumbnail?id=1NQQ1T12MS4znJySUkOikWstm2QbcIvOI&sz=w1000" alt="Lumen Render 5"></div>
+                </div>
+                <button class="slider-btn slider-next" onclick="moveSlide(1)">&#10095;</button>
+            </div>
+        </section>
+
+        <!-- 11. БЛОК 10: 3D-КОНФІГУРАТОР -->
+        <section class="paper-card">
+            <div class="card-info">
+                <h2>INTERACTIVE MERCH CUSTOMIZATION TOOL</h2>
+                <div class="subtitle">3D Configurator: a brand you can try on</div>
+                <p>And here is where Blender came in handy — a program without a programmer. Gemini + Blender + a little time = 3d-customizer.</p>
+                <p>The selected item can be customized, color-selected, a print added, the background removed in one click, and your unique item sent to the cart with all attributes.</p>
+                 <p>They say I'm a neogeneralist. I don't know what that means..</p>
+                <a href="https://mstativko-blip.github.io/models/" target="_blank" class="btn">TRY IT →</a>
+            </div>
+            <div class="laptop-phone-composition">
+                <div class="laptop-mockup" style="width: 100%;">
+                    <img src="https://drive.google.com/thumbnail?id=1All_Q6aO2_f11j3KnD9_W6mQNRl-HEZU&sz=w1000" alt="3D Customizer" class="laptop-screen">
+                </div>
+                <div class="laptop-base" style="width: 100%;"></div>
+            </div>
+        </section>
+
+        <!-- 12. БЛОК 11: ANDROID-СУФЛЕР TUSHNITSA -->
+       <section class="paper-card">
+            <div class="card-info">
+                <h2>КCUSTOM MOBILE DEVELOPMENT</h2>
+                <div class="subtitle">...and finally</div>
+                <p>I got tired of looking for a normal teleprompter in the Play Market, so I sat down and made one myself.</p>
+                <p>I wrote the app in Android Studio: floating control elements, adjusting background opacity, text size.</p>
+                <p>Plus a thumb-controlled remote for my right hand, with a pause button on it. You can hold it unnoticed by the viewer, and the text will stay in place. Then let go, and the lines scroll along. Pure joy!</p>
+                <p>And most importantly, no ads, because where would they come from?</p>
+                <p>I named this app "Tushnitsa" – in honor of my cat.</p>
+            </div>
+            <div class="double-phone-wrapper">
+                <div class="phone-back">
+                    <img src="https://drive.google.com/thumbnail?id=1luCAgZB83xi27urHnUrrI8HORJc565Bb&sz=w1000" alt="Tushnitsa Interface">
+                </div>
+                <div class="phone-front">
+                    <img src="https://drive.google.com/thumbnail?id=1oNvfmIL5rL1OQHOcH6ZoAUrq4E7bJi-G&sz=w1000" alt="Tushnitsa Camera Overlay">
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 13. ФУТЕР (100% width) -->
+<footer class="hero-footer">
+        <div class="footer-content">
+            <h2 class="footer-title">НLET THE NEXT IDEA<br>BE YOURS.</h2>
+            <div class="footer-contacts" style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Email -->
+                <p style="display: flex; align-items: center; gap: 10px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    <a href="mailto:mstativko@gmail.com">mstativko@gmail.com</a>
+                </p>
+                <!-- Telegram -->
+                <p style="display: flex; align-items: center; gap: 10px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2L2 9.5l8 3.5 3.5 8L21.5 2z"/><path d="M10 13l6-6"/></svg>
+                    <a href="https://t.me/mstativko" target="_blank">@mstativko</a>
+                </p>
+                <!-- WhatsApp 1 (+380...) -->
+                <p style="display: flex; align-items: center; gap: 10px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <a href="https://wa.me/380632823357" target="_blank">+380 63 282 33 57 (WhatsApp)</a>
+                </p>
+                <!-- WhatsApp 2 (+39...) -->
+                <p style="display: flex; align-items: center; gap: 10px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <a href="https://wa.me/393773258701" target="_blank">+39 377 325 87 01 (WhatsApp)</a>
+                </p>
+            </div>
+            <div class="footer-location">
+                Max Stativko – Salerno, Italy
+            </div>
+        </div>
+    </footer>
+    
+    <!-- ПОП-АП: Резюме PDF -->
+    <div class="modal" id="resumeModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('resumeModal')">&times;</span>
+            <iframe src="https://drive.google.com/file/d/1rs0SnLcW8-F8Ml5-AbFYeb--AsGO5UsO/preview"></iframe>
+        </div>
+    </div>
+
+    <!-- ПОП-АП: 3D-конфігуратор -->
+    <div class="modal" id="configModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('configModal')">&times;</span>
+            <iframe src="https://hpbrands.net" title="3D Customizer Tool"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Ефект паралакса для заднього фону
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const bg = document.getElementById('parallaxBg');
+            bg.style.transform = 'translateY(' + (scrolled * 0.15) + 'px)';
+        });
+
+        // Інтерактивна галерея слайдера
+        let currentSlide = 0;
+        function moveSlide(direction) {
+            const slider = document.getElementById('lumenSlider');
+            const totalSlides = slider.children.length;
+            currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
+            slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+        }
+
+        // Керування модальними вікнами
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Закриття поп-апу при кліку поза ним
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        };
+    </script>
+</body>
+</html>
 
