@@ -1,12 +1,8 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import axios from 'axios';
 
-// Загружаем настройки из Vercel (переменные окружения)
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-// СИСТЕМНЫЙ ПРОМПТ (Характер Джессики)
 const systemPrompt = `
 Ти — Джесіка, інтелектуальна асистентка та співрозмовниця на особистому сайті Макса Статівко.
 
@@ -47,7 +43,6 @@ const systemPrompt = `
 `;
 
 export default async function handler(req, res) {
-  // Настройка CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -62,37 +57,42 @@ export default async function handler(req, res) {
 
   try {
     const { messages } = req.body;
-    
-    if (!process.env.GEMINI_API_KEY) {
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
       return res.status(500).json({ error: "Missing GEMINI_API_KEY" });
     }
 
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-
-    // Строгое чередование ролей для правильной работы Gemini API
-    const chatHistory = [
+    // Формуємо вміст із системним промптом
+    const contents = [
       { role: "user", parts: [{ text: "Системна інструкція:\n" + systemPrompt }] },
-      { role: "model", parts: [{ text: "Зрозуміла. Я готова виконувати роль Джесіки згідно з цим характером." }] },
-      ...messages.slice(0, -1)
+      { role: "model", parts: [{ text: "Зрозуміла. Я готова виконувати роль Джесіки." }] },
+      ...messages
     ];
 
-    const chat = model.startChat({
-      history: chatHistory,
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+    const apiResponse = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents })
     });
 
-    const lastMessage = messages[messages.length - 1];
-    const userText = lastMessage.parts[0].text;
-    const result = await chat.sendMessage(userText);
-    const responseText = result.response.text();
+    const data = await apiResponse.json();
 
-    // Проверка и отправка уведомления в Telegram при наличии лида
+    if (!apiResponse.ok) {
+      console.error("Gemini API Error details:", JSON.stringify(data));
+      throw new Error(data.error?.message || "Gemini API return error status");
+    }
+
+    const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Вибачте, виникла проблема з генерацією відповіді.";
+
+    // Перевірка лідів для Telegram
     const summaryMatch = responseText.match(/\[SUMMARY_START\](.*?)\[SUMMARY_END\]/s);
     if (summaryMatch) {
-      const summaryJsonString = summaryMatch[1].trim();
-      
       if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
         try {
-          const summary = JSON.parse(summaryJsonString);
+          const summary = JSON.parse(summaryMatch[1].trim());
           const telegramMessage = `🔔 **Новий лід із сайту!**\n\n👤 **Клієнт:** ${summary.client_name}\n📞 **Контакт:** ${summary.contact}\n🎯 **Задача:** ${summary.task_type}\n📝 **Резюме:**\n${summary.summary}`;
           
           await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
@@ -106,12 +106,11 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
       }
     }
 
-    // Возвращаем чистый ответ Джессики на фронтенд
     const cleanResponse = responseText.replace(/\[SUMMARY_START\].*?\[SUMMARY_END\]/s, '').trim();
     res.status(200).json({ text: cleanResponse });
 
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error in /api/chat:", error);
     res.status(500).json({ error: error.message });
   }
 }
