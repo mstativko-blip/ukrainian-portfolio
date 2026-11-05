@@ -29,11 +29,13 @@
             --line-red: rgba(255, 74, 74, 0.15);
         }
 
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
+
 
         body {
             font-family: 'Montserrat', sans-serif;
@@ -43,6 +45,7 @@
             overflow-x: hidden;
             position: relative;
         }
+
 
         /* Загальний паралакс-фон із лініями */
         .parallax-bg {
@@ -62,6 +65,7 @@
             will-change: transform;
         }
 
+
         /* Хедер 100% width */
         .hero-header {
             width: 100%;
@@ -71,6 +75,7 @@
             position: relative;
         }
 
+
         .hero-content {
             max-width: 1200px;
             margin: 0 auto;
@@ -79,12 +84,14 @@
             justify-content: space-between;
         }
 
+
         .hero-top-text {
             align-self: flex-end;
             text-align: right;
             max-width: 450px;
             margin-bottom: 40px;
         }
+
 
         .hero-top-text h3 {
             font-size: 1.2rem;
@@ -94,11 +101,13 @@
             margin-bottom: 8px;
         }
 
+
         .hero-top-text p {
             font-size: 1.05rem;
             opacity: 0.85;
             font-style: italic;
         }
+
 
         .hero-title {
             font-size: clamp(3.5rem, 11vw, 9.5rem);
@@ -108,6 +117,7 @@
             text-transform: uppercase;
         }
 
+
         /* Основна контейнерна сітка */
         .container {
             max-width: 1100px;
@@ -116,6 +126,7 @@
             position: relative;
             z-index: 2;
         }
+
 
         /* Паперові картки блоків */
         .paper-card {
@@ -133,14 +144,182 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
+
         .paper-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08), 0 3px 10px rgba(0, 0, 0, 0.05);
         }
 
+
+        /* Стилі для інтерактивного слайдера першого блоку */
+        .intro-slider-card {
+            display: block !important; /* Перевизначаємо grid для гнучкого управління всередині */
+        }
+
+        .slide-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide-container.reverse {
+            grid-template-columns: 1fr 1fr;
+            direction: rtl; /* Дзеркально міняємо місцями колонки без зламу розмітки */
+        }
+
+        .slide-container.reverse > * {
+            direction: ltr; /* Повертаємо нормальний напрямок тексту усередині блоків */
+        }
+
+        .slide-text-side {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide-image-side {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .hint-badge {
+            position: absolute;
+            top: -15px;
+            background: var(--charcoal);
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 20px;
+            pointer-events: none;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: pulseHint 2s infinite;
+            z-index: 5;
+        }
+
+        @keyframes pulseHint {
+            0% { transform: scale(1); opacity: 0.95; }
+            50% { transform: scale(1.04); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.95; }
+        }
+
+        /* Вбудований чат Джесіки */
+        .embedded-chat {
+            display: none;
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .chat-messages-list {
+            height: 170px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-right: 5px;
+        }
+
+        .msg-bubble {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.45;
+        }
+
+        .msg-bubble.jessica {
+            background: #f0f2f5;
+            color: var(--charcoal);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .msg-bubble.user {
+            background: var(--brand-red);
+            color: var(--charcoal);
+            font-weight: 600;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .chat-input-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input-row input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .chat-input-row input:focus {
+            border-color: var(--brand-red);
+        }
+
+        .chat-input-row button {
+            background: var(--charcoal);
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .chat-input-row button:hover {
+            background: var(--brand-red);
+            color: var(--charcoal);
+        }
+
+        /* Переключавальні кнопки слайдера */
+        .slider-footer-dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+            border-top: 1px solid rgba(0,0,0,0.06);
+            padding-top: 20px;
+        }
+
+        .dot-btn {
+            padding: 6px 18px;
+            border-radius: 20px;
+            background: #eee;
+            color: #666;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dot-btn.active {
+            background: var(--charcoal);
+            color: #fff;
+        }
+
+
         .card-full-width {
             grid-template-columns: 1fr;
         }
+
 
         .card-info h2 {
             font-size: 1.8rem;
@@ -151,6 +330,7 @@
             letter-spacing: -0.5px;
         }
 
+
         .card-info .subtitle {
             font-size: 1rem;
             color: #666;
@@ -158,15 +338,18 @@
             font-weight: 700;
         }
 
+
         .card-info p {
             font-size: 1.02rem;
             color: #333;
             margin-bottom: 16px;
         }
 
+
         .card-info p:last-of-type {
             margin-bottom: 0;
         }
+
 
         /* Стилі кнопок */
         .btn {
@@ -185,11 +368,13 @@
             transition: background-color 0.2s ease, transform 0.2s ease;
         }
 
+
         .btn:hover {
             background-color: var(--brand-red);
             color: var(--charcoal);
             transform: translateY(-2px);
         }
+
 
         /* Медіаконтейнери та мокапи */
         .media-container {
@@ -199,6 +384,7 @@
             position: relative;
         }
 
+
         .video-responsive {
             position: relative;
             padding-bottom: 56.25%;
@@ -206,6 +392,7 @@
             overflow: hidden;
             border-radius: 6px;
         }
+
 
         .video-responsive iframe {
             position: absolute;
@@ -216,11 +403,13 @@
             border: 0;
         }
 
+
         /* Мобільний мокап */
         .phone-mockup-wrapper {
             display: flex;
             justify-content: center;
         }
+
 
         .phone-mockup {
             width: 280px;
@@ -233,6 +422,7 @@
             position: relative;
         }
 
+
         .phone-mockup iframe {
             width: 100%;
             height: 100%;
@@ -240,12 +430,14 @@
             border: none;
         }
 
+
         /* Двоповерховий мокап ноутбука + смартфона */
         .laptop-phone-composition {
             position: relative;
             width: 100%;
             padding-bottom: 20px;
         }
+
 
         .laptop-mockup {
             width: 85%;
@@ -255,6 +447,7 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
+
         .laptop-screen {
             width: 100%;
             aspect-ratio: 16/10;
@@ -262,6 +455,7 @@
             border-radius: 4px 4px 0 0;
             display: block;
         }
+
 
         .laptop-base {
             width: 95%;
@@ -271,6 +465,7 @@
             margin: 0 auto;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
+
 
         .phone-overlay {
             position: absolute;
@@ -284,6 +479,7 @@
             border: 2px solid #444;
         }
 
+
         .phone-overlay img {
             width: 100%;
             aspect-ratio: 9/19;
@@ -291,6 +487,7 @@
             border-radius: 18px;
             display: block;
         }
+
 
         /* Слайдер-галерея для 3D */
         .slider-wrapper {
@@ -300,15 +497,18 @@
             overflow: hidden;
         }
 
+
         .slider-slides {
             display: flex;
             transition: transform 0.4s ease-in-out;
         }
 
+
         .slider-slide {
             min-width: 100%;
-            box-sizing: border-border-box;
+            box-sizing: border-box;
         }
+
 
         .slider-slide img {
             width: 100%;
@@ -316,6 +516,7 @@
             display: block;
             border-radius: 6px;
         }
+
 
         .slider-btn {
             position: absolute;
@@ -336,13 +537,16 @@
             z-index: 10;
         }
 
+
         .slider-btn:hover {
             background: var(--brand-red);
             color: var(--charcoal);
         }
 
+
         .slider-prev { left: 10px; }
         .slider-next { right: 10px; }
+
 
         /* Повідомлення та Поп-апи */
         .modal {
@@ -359,6 +563,7 @@
             padding: 20px;
         }
 
+
         .modal-content {
             background: #fff;
             width: 100%;
@@ -370,6 +575,7 @@
             display: flex;
             flex-direction: column;
         }
+
 
         .modal-close {
             position: absolute;
@@ -383,11 +589,13 @@
             line-height: 1;
         }
 
+
         .modal iframe {
             width: 100%;
             height: 100%;
             border: none;
         }
+
 
         /* Фото автора */
         .author-photo {
@@ -399,6 +607,7 @@
             margin: 0 auto;
         }
 
+
         /* Дві мобілки для Android Studio */
         .double-phone-wrapper {
             position: relative;
@@ -408,6 +617,7 @@
             align-items: center;
             justify-content: center;
         }
+
 
         .phone-back {
             position: absolute;
@@ -421,6 +631,7 @@
             border: 2px solid #444;
             transform: rotate(-6deg);
         }
+
 
         .phone-front {
             position: absolute;
@@ -436,11 +647,13 @@
             z-index: 2;
         }
 
+
         .phone-back img, .phone-front img {
             width: 100%;
             border-radius: 16px;
             display: block;
         }
+
 
         /* Футер 100% width */
         .hero-footer {
@@ -451,10 +664,12 @@
             margin-top: 100px;
         }
 
+
         .footer-content {
             max-width: 1100px;
             margin: 0 auto;
         }
+
 
         .footer-title {
             font-size: clamp(2.5rem, 6vw, 5.5rem);
@@ -465,11 +680,13 @@
             letter-spacing: -1px;
         }
 
+
         .footer-contacts p {
             font-size: 1.1rem;
             margin-bottom: 8px;
             font-weight: 700;
         }
+
 
         .footer-contacts a {
             color: var(--charcoal);
@@ -477,28 +694,34 @@
             border-bottom: 2px solid var(--charcoal);
         }
 
+
         .footer-location {
             margin-top: 30px;
             font-size: 1rem;
             opacity: 0.8;
         }
 
+
         /* Адаптивність */
         @media (max-width: 850px) {
-            .paper-card {
+            .paper-card, .slide-container, .slide-container.reverse {
                 grid-template-columns: 1fr;
                 padding: 30px;
                 gap: 25px;
+                direction: ltr !important;
             }
+
 
             .hero-top-text {
                 text-align: left;
                 align-self: flex-start;
             }
 
+
             .phone-overlay {
                 width: 40%;
             }
+
 
             .double-phone-wrapper {
                 height: 320px;
@@ -506,193 +729,6 @@
             .phone-back { left: 5%; width: 150px; }
             .phone-front { right: 5%; width: 160px; }
         }
-        .intro-slider-section {
-    background: #ffffff;
-    padding: 40px;
-    border-radius: 20px;
-    max-width: 1000px;
-    margin: 40px auto;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-    position: relative;
-}
-
-.slide-container {
-    display: flex;
-    align-items: flex-start;
-    gap: 40px;
-    justify-content: space-between;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.slide-container.reverse {
-    flex-direction: row-reverse;
-}
-
-.slide-text-side {
-    flex: 1.1;
-    color: #1a1a1a;
-    display: flex;
-    flex-direction: column;
-}
-
-.slide-text-side h2 {
-    font-size: 32px;
-    font-weight: 800;
-    margin: 0 0 8px 0;
-    color: #111;
-    letter-spacing: -0.5px;
-    text-transform: uppercase;
-}
-
-.slide-text-side h4 {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0 0 16px 0;
-    color: #333;
-}
-
-.slide-text-side p {
-    font-size: 15px;
-    line-height: 1.6;
-    color: #555;
-    margin: 0 0 20px 0;
-}
-
-.slide-image-side {
-    flex: 0.9;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-}
-
-.slide-image-side img {
-    width: 100%;
-    max-width: 380px;
-    height: 420px;
-    object-fit: cover;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-    transition: transform 0.3s ease;
-}
-
-.hint-badge {
-    position: absolute;
-    top: 15px;
-    background: rgba(0, 0, 0, 0.65);
-    backdrop-filter: blur(8px);
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 6px 14px;
-    border-radius: 20px;
-    pointer-events: none;
-    letter-spacing: 0.5px;
-    animation: pulseHint 2s infinite;
-}
-
-@keyframes pulseHint {
-    0% { transform: scale(1); opacity: 0.9; }
-    50% { transform: scale(1.05); opacity: 1; }
-    100% { transform: scale(1); opacity: 0.9; }
-}
-
-.embedded-chat {
-    display: none;
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 12px;
-    padding: 15px;
-    margin-top: 10px;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-}
-
-.chat-messages-list {
-    height: 180px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 12px;
-    padding-right: 5px;
-}
-
-.msg-bubble {
-    max-width: 85%;
-    padding: 10px 14px;
-    border-radius: 10px;
-    font-size: 14px;
-    line-height: 1.45;
-}
-
-.msg-bubble.jessica {
-    background: #ffffff;
-    color: #1a1a1a;
-    align-self: flex-start;
-    border: 1px solid #e2e8f0;
-    border-bottom-left-radius: 2px;
-}
-
-.msg-bubble.user {
-    background: #ff3b30;
-    color: #ffffff;
-    align-self: flex-end;
-    border-bottom-right-radius: 2px;
-}
-
-.chat-input-row {
-    display: flex;
-    gap: 8px;
-}
-
-.chat-input-row input {
-    flex: 1;
-    padding: 10px 14px;
-    border: 1px solid #ced4da;
-    border-radius: 8px;
-    font-size: 14px;
-    outline: none;
-}
-
-.chat-input-row button {
-    background: #1a1a1a;
-    color: #fff;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.chat-input-row button:hover {
-    background: #ff3b30;
-}
-
-.slider-footer {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-top: 25px;
-}
-
-.dot-btn {
-    padding: 6px 16px;
-    border-radius: 20px;
-    background: #f1f3f5;
-    color: #666;
-    font-size: 13px;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.dot-btn.active {
-    background: #1a1a1a;
-    color: #fff;
-}
     </style>
 </head>
 <body>
@@ -705,6 +741,7 @@
     <!-- Фон з лініями -->
     <div class="parallax-bg" id="parallaxBg"></div>
 
+
     <!-- 1. ХЕДЕР (100% width) -->
     <header class="hero-header">
         <div class="hero-content">
@@ -716,54 +753,56 @@
         </div>
     </header>
 
+
     <main class="container">
 
-        <!-- 2. БЛОК 01: ОДНИМ СЛОВОМ (Знайомство) -->
-    <section class="paper-card">
-           <div class="intro-slider-section">
-    <div class="slide-container" id="sliderBlock">
-        
-        <!-- ТЕКСТ + ЧАТ -->
-        <div class="slide-text-side">
-            <h2>ОДНИМ СЛОВОМ</h2>
-            <h4 id="slideSubtitle">Привіт, я Макс Статівко</h4>
-            <p id="slideDesc">
-                Я створюю концепції, пишу сценарії, знімаю, монтую, керую командами та роблю цікаві штуки з характером. Від постів в соцмережах до рекламних роликів. Від AI-3D до вайб-кодингу інструментів інтерактивної візуалізації.<br><br>
-                Це сайт-презентація деяких моїх робіт.
-            </p>
 
-            <div id="maxAction">
-                <a href="#" style="display:inline-block; background:#1a1a1a; color:#fff; padding:10px 22px; border-radius:8px; text-decoration:none; font-weight:600;">Резюме</a>
-            </div>
+        <!-- 2. БЛОК 01: ІНТЕРАКТИВНИЙ СЛАЙДЕР (Макс / Джесіка + Чат) -->
+        <section class="paper-card intro-slider-card">
+            <div class="slide-container" id="sliderBlock">
+                
+                <!-- ТЕКСТОВА ЧАСТИНА (Зліва для Макса, справа для Джесіки) -->
+                <div class="slide-text-side">
+                    <h2 id="slideHeading">Одним словом</h2>
+                    <div class="subtitle" id="slideSubtitle">Привіт, я Макс Статівко</div>
+                    <div id="slideDescContent">
+                        <p>Я створюю концепції, пишу сценарії, знімаю, монтую, керую командами та роблю цікаві штуки з характером. Від постів в соцмережах до рекламних роликів. Від AI-3D до вайб-кодингу інструментів інтерактивної візуалізації.</p>
+                        <p>Це сайт-презентація деяких моїх робіт.</p>
+                    </div>
 
-            <!-- ВСТРОЕННЫЙ ЧАТ ДЖЕССИКИ -->
-            <div class="embedded-chat" id="jessicaChatBox">
-                <div class="chat-messages-list" id="chatMessages">
-                    <div class="msg-bubble jessica">
-                        Вітаю! Я Джесіка. Чим можу допомогти або про що розповісти?
+                    <!-- Кнопка резюме для Макса -->
+                    <div id="maxActionBlock">
+                        <button class="btn" onclick="openModal('resumeModal')">Резюме</button>
+                    </div>
+
+                    <!-- Вбудований живий чат із Джесікою (з'являється на 2 слайді) -->
+                    <div class="embedded-chat" id="jessicaChatBox">
+                        <div class="chat-messages-list" id="chatMessages">
+                            <div class="msg-bubble jessica">
+                                Вітаю! Я ШІ-літературний секретар Макса. Допомагаю гостям сайту сформулювати, як саме ми з ним можемо вам допомогти. Про що бажаєте дізнатися?
+                            </div>
+                        </div>
+                        <div class="chat-input-row">
+                            <input type="text" id="userInput" placeholder="Напишіть Джесіці..." onkeypress="handleKey(event)">
+                            <button onclick="sendMsg()">Надіслати</button>
+                        </div>
                     </div>
                 </div>
-                <div class="chat-input-row">
-                    <input type="text" id="userInput" placeholder="Напишіть Джесіці..." onkeypress="handleKey(event)">
-                    <button onclick="sendMsg()">Надіслати</button>
+
+                <!-- ФОТОЧАСТИНА ЗІ СВАЙП-ПОДСКАЗКОЮ -->
+                <div class="slide-image-side" onclick="toggleSlide()">
+                    <div class="hint-badge" id="hintBadge">‹ Переключити на Джесіку ›</div>
+                    <img id="slideImg" src="https://drive.google.com/thumbnail?id=1C6bk1pV-4zzBDnaGODLGQKOXn0gGHr7I&sz=w1000" alt="Макс Статівко" class="author-photo" style="margin: 0;">
                 </div>
+
             </div>
-        </div>
 
-        <!-- КАРТИНКА С ПОДСКАЗКОЙ -->
-        <div class="slide-image-side" onclick="toggleSlide()">
-            <div class="hint-badge" id="hintBadge">‹ Переключити на Джесіку ›</div>
-            <img id="slideImg" src="max.jpg" alt="Макс Статівко">
-        </div>
-
-    </div>
-
-    <!-- ПЕРЕКЛЮЧАТЕЛИ ВНИЗУ -->
-    <div class="slider-footer">
-        <button class="dot-btn active" id="btnSlide1" onclick="setSlide(1)">1. Макс</button>
-        <button class="dot-btn" id="btnSlide2" onclick="setSlide(2)">2. Джесіка</button>
-    </div>
-</div>
+            <!-- Нижні міні-кнопки перемикання слайдів -->
+            <div class="slider-footer-dots">
+                <button class="dot-btn active" id="btnSlide1" onclick="setSlide(1)">1. Макс</button>
+                <button class="dot-btn" id="btnSlide2" onclick="setSlide(2)">2. Джесіка</button>
+            </div>
+        </section>
         
         <!-- 3. БЛОК 02: VAU-BOO (Постановний ролик) -->
      <section class="paper-card">
@@ -779,6 +818,7 @@
             </div>
         </section>
 
+
         <!-- 4. БЛОК 03: BIZOL (Іміджеве відео) -->
         <section class="paper-card">
             <div class="card-info">
@@ -792,6 +832,7 @@
                 </div>
             </div>
         </section>
+
 
         <!-- 5. БЛОК 04: VECTOR3 (2D-анімація) -->
         <section class="paper-card">
@@ -808,6 +849,7 @@
             </div>
         </section>
 
+
         <!-- 6. БЛОК 05: CRYPTO-KARATIST (YouTube-заставка) -->
         <section class="paper-card">
             <div class="card-info">
@@ -823,6 +865,7 @@
             </div>
         </section>
 
+
         <!-- 7. БЛОК 06: ШІ-ВІДЕО (Vertical Drama) -->
         <section class="paper-card">
             <div class="card-info">
@@ -837,6 +880,7 @@
                 </div>
             </div>
         </section>
+
 
         <!-- 8. БЛОК 07: ЗАТИШНИЙ ШЕКЕЛЬ (Медіа) -->
        <section class="paper-card">
@@ -854,6 +898,7 @@
                 </div>
             </div>
         </section>
+
 
         <!-- 9. БЛОК 08: КАТЕРИНА ЛОМОНОСОВ (Сайт) -->
         <section class="paper-card">
@@ -874,6 +919,7 @@
                 </div>
             </div>
         </section>
+
 
         <!-- 10. БЛОК 09: LUMEN (3D Галерея) -->
        <section class="paper-card">
@@ -896,6 +942,7 @@
             </div>
         </section>
 
+
         <!-- 11. БЛОК 10: 3D-КОНФІГУРАТОР -->
         <section class="paper-card">
             <div class="card-info">
@@ -913,6 +960,7 @@
                 <div class="laptop-base" style="width: 100%;"></div>
             </div>
         </section>
+
 
         <!-- 12. БЛОК 11: ANDROID-СУФЛЕР TUSHNITSA -->
        <section class="paper-card">
@@ -935,7 +983,9 @@
             </div>
         </section>
 
+
     </main>
+
 
     <!-- 13. ФУТЕР (100% width) -->
 <footer class="hero-footer">
@@ -977,6 +1027,7 @@
         </div>
     </div>
 
+
     <!-- ПОП-АП: 3D-конфігуратор -->
     <div class="modal" id="configModal">
         <div class="modal-content">
@@ -984,6 +1035,7 @@
             <iframe src="https://hpbrands.net" title="3D Customizer Tool"></iframe>
         </div>
     </div>
+
 
     <script>
         // Ефект паралакса для заднього фону
@@ -993,25 +1045,29 @@
             bg.style.transform = 'translateY(' + (scrolled * 0.15) + 'px)';
         });
 
-        // Інтерактивна галерея слайдера
-        let currentSlide = 0;
+
+        // Інтерактивна галерея слайдера (для 3D)
+        let currentSlideGallery = 0;
         function moveSlide(direction) {
             const slider = document.getElementById('lumenSlider');
             const totalSlides = slider.children.length;
-            currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
-            slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+            currentSlideGallery = (currentSlideGallery + direction + totalSlides) % totalSlides;
+            slider.style.transform = `translateX(-${currentSlideGallery * 100}%)`;
         }
 
-        // Керування модальними вікнами
+
+        // Управління модальними вікнами
         function openModal(id) {
             document.getElementById(id).style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
 
+
         function closeModal(id) {
             document.getElementById(id).style.display = 'none';
             document.body.style.overflow = 'auto';
         }
+
 
         // Закриття поп-апу при кліку поза ним
         window.onclick = function(event) {
@@ -1020,101 +1076,112 @@
                 document.body.style.overflow = 'auto';
             }
         };
-    </script>
-    <script>
-    let currentSlide = 1;
-    let messageHistory = [];
 
-    function toggleSlide() {
-        setSlide(currentSlide === 1 ? 2 : 1);
-    }
+        // --- ЛОГІКА ІНТЕРАКТИВНОГО СЛАЙДЕРА МАКС / ДЖЕСІКА ---
+        let currentIntroSlide = 1;
+        let messageHistory = [];
 
-    function setSlide(num) {
-        currentSlide = num;
-        const container = document.getElementById('sliderBlock');
-        const subtitle = document.getElementById('slideSubtitle');
-        const desc = document.getElementById('slideDesc');
-        const img = document.getElementById('slideImg');
-        const maxAction = document.getElementById('maxAction');
-        const chatBox = document.getElementById('jessicaChatBox');
-        const hintBadge = document.getElementById('hintBadge');
-        
-        const btn1 = document.getElementById('btnSlide1');
-        const btn2 = document.getElementById('btnSlide2');
-
-        if (num === 1) {
-            container.classList.remove('reverse');
-            subtitle.innerText = "Привіт, я Макс Статівко";
-            desc.style.display = "block";
-            desc.innerHTML = `Я створюю концепції, пишу сценарії, знімаю, монтую, керую командами та роблю цікаві штуки з характером. Від постів в соцмережах до рекламних роликів. Від AI-3D до вайб-кодингу інструментів інтерактивної візуалізації.<br><br>Це сайт-презентація деяких моїх робіт.`;
-            
-            img.src = "max.jpg";
-            img.alt = "Макс Статівко";
-            
-            maxAction.style.display = "block";
-            chatBox.style.display = "none";
-            
-            hintBadge.innerText = "‹ Переключити на Джесіку ›";
-            btn1.classList.add('active');
-            btn2.classList.remove('active');
-        } else {
-            container.classList.add('reverse');
-            subtitle.innerText = "Привіт, я Джесіка";
-            desc.style.display = "block";
-            desc.innerHTML = `Я ШІ-літературний секретар Макса. Я допомагаю гостям сайту сформулювати, як саме ми з ним можемо вам допомогти.`;
-            
-            img.src = "jessica.jpeg";
-            img.alt = "Джесіка";
-            
-            maxAction.style.display = "none";
-            chatBox.style.display = "block";
-            
-            hintBadge.innerText = "‹ повернутися до Макса ›";
-            btn2.classList.add('active');
-            btn1.classList.remove('active');
-            
-            setTimeout(() => document.getElementById('userInput').focus(), 300);
+        function toggleSlide() {
+            setSlide(currentIntroSlide === 1 ? 2 : 1);
         }
-    }
 
-    async function sendMsg() {
-        const input = document.getElementById('userInput');
-        const messagesDiv = document.getElementById('chatMessages');
-        const text = input.value.trim();
+        function setSlide(num) {
+            currentIntroSlide = num;
+            const container = document.getElementById('sliderBlock');
+            const heading = document.getElementById('slideHeading');
+            const subtitle = document.getElementById('slideSubtitle');
+            const descContent = document.getElementById('slideDescContent');
+            const img = document.getElementById('slideImg');
+            const maxActionBlock = document.getElementById('maxActionBlock');
+            const chatBox = document.getElementById('jessicaChatBox');
+            const hintBadge = document.getElementById('hintBadge');
+            
+            const btn1 = document.getElementById('btnSlide1');
+            const btn2 = document.getElementById('btnSlide2');
 
-        if (!text) return;
-
-        messagesDiv.innerHTML += `<div class="msg-bubble user">${text}</div>`;
-        input.value = '';
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-        messageHistory.push({ role: "user", parts: [{ text: text }] });
-
-        try {
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messages: messageHistory })
-            });
-
-            const data = await response.json();
-
-            if (data.text) {
-                messagesDiv.innerHTML += `<div class="msg-bubble jessica">${data.text}</div>`;
-                messageHistory.push({ role: "model", parts: [{ text: data.text }] });
+            if (num === 1) {
+                // Слайд 1: Макс
+                container.classList.remove('reverse');
+                heading.innerText = "Одним словом";
+                subtitle.innerText = "Привіт, я Макс Статівко";
+                descContent.style.display = "block";
+                descContent.innerHTML = `
+                    <p>Я створюю концепції, пишу сценарії, знімаю, монтую, керую командами та роблю цікаві штуки з характером. Від постів в соцмережах до рекламних роликів. Від AI-3D до вайб-кодингу інструментів інтерактивної візуалізації.</p>
+                    <p>Це сайт-презентація деяких моїх робіт.</p>
+                `;
+                img.src = "https://drive.google.com/thumbnail?id=1C6bk1pV-4zzBDnaGODLGQKOXn0gGHr7I&sz=w1000";
+                img.alt = "Макс Статівко";
+                
+                maxActionBlock.style.display = "block";
+                chatBox.style.display = "none";
+                
+                hintBadge.innerText = "‹ Переключити на Джесіку ›";
+                btn1.classList.add('active');
+                btn2.classList.remove('active');
             } else {
-                messagesDiv.innerHTML += `<div class="msg-bubble jessica">Зв'язок трохи підвів. Спробуємо ще раз?</div>`;
+                // Слайд 2: Джесіка
+                container.classList.add('reverse');
+                heading.innerText = "Одним словом";
+                subtitle.innerText = "Привіт, я Джесіка";
+                descContent.style.display = "block";
+                descContent.innerHTML = `
+                    <p>Я ШІ-літературний секретар Макса. Допомагаю гостям сайту сформулювати, як саме ми з ним можемо вам допомогти.</p>
+                `;
+                img.src = "jessica.jpeg";
+                img.alt = "Джесіка";
+                
+                maxActionBlock.style.display = "none";
+                chatBox.style.display = "block"; // Активний чат одразу відкривається
+                
+                hintBadge.innerText = "‹ Повернутися до Макса ›";
+                btn2.classList.add('active');
+                btn1.classList.remove('active');
+                
+                // Фокус у поле введення для швидкого набору
+                setTimeout(() => document.getElementById('userInput').focus(), 300);
             }
-        } catch (e) {
-            messagesDiv.innerHTML += `<div class="msg-bubble jessica">Помилка з'єднання із сервером.</div>`;
         }
 
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
+        // --- ЛОГІКА ВБУДОВАНОГО ЧАТУ ЗІ СЕРВЕРОМ НА VERCEL ---
+        async function sendMsg() {
+            const input = document.getElementById('userInput');
+            const messagesDiv = document.getElementById('chatMessages');
+            const text = input.value.trim();
 
-    function handleKey(e) {
-        if (e.key === 'Enter') sendMsg();
-    }
-</script>
+            if (!text) return;
+
+            // Виводимо повідомлення користувача
+            messagesDiv.innerHTML += `<div class="msg-bubble user">Ви: ${text}</div>`;
+            input.value = '';
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            messageHistory.push({ role: "user", parts: [{ text: text }] });
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ messages: messageHistory })
+                });
+
+                const data = await response.json();
+
+                if (data.text) {
+                    messagesDiv.innerHTML += `<div class="msg-bubble jessica">Джесіка: ${data.text}</div>`;
+                    messageHistory.push({ role: "model", parts: [{ text: data.text }] });
+                } else {
+                    messagesDiv.innerHTML += `<div class="msg-bubble jessica">Джесіка: Сталася технічна помилка. Спробуймо ще раз?</div>`;
+                }
+            } catch (e) {
+                messagesDiv.innerHTML += `<div class="msg-bubble jessica">Джесіка: Не вдалося з'єднатися із сервером.</div>`;
+            }
+
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function handleKey(e) {
+            if (e.key === 'Enter') sendMsg();
+        }
+    </script>
 </body>
 </html>
