@@ -1,12 +1,12 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import axios from 'axios';
 
-// Завантажуємо налаштування з Vercel (змінні середовища)
+// Загружаем настройки из Vercel (переменные окружения)
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-// НАШ СИСТЕМНИЙ ПРОМПТ (Характер Джесіки)
+// СИСТЕМНЫЙ ПРОМПТ (Характер Джессики)
 const systemPrompt = `
 Ти — Джесіка, інтелектуальна асистентка та співрозмовниця на особистому сайті Макса Статівко.
 
@@ -47,7 +47,7 @@ const systemPrompt = `
 `;
 
 export default async function handler(req, res) {
-  // Налаштовуємо CORS, щоб сайт міг робити запити
+  // Настройка CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -63,33 +63,33 @@ export default async function handler(req, res) {
   try {
     const { messages } = req.body;
     
-    // Перевіряємо наявність API-ключа
     if (!process.env.GEMINI_API_KEY) {
       return res.status(500).json({ error: "Missing GEMINI_API_KEY" });
     }
 
-const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      systemInstruction: systemPrompt 
-    });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const chatHistory = messages.slice(0, -1);
-    const lastMessage = messages[messages.length - 1];
+    // Строгое чередование ролей для правильной работы Gemini API
+    const chatHistory = [
+      { role: "user", parts: [{ text: "Системна інструкція:\n" + systemPrompt }] },
+      { role: "model", parts: [{ text: "Зрозуміла. Я готова виконувати роль Джесіки згідно з цим характером." }] },
+      ...messages.slice(0, -1)
+    ];
 
     const chat = model.startChat({
       history: chatHistory,
     });
 
+    const lastMessage = messages[messages.length - 1];
     const userText = lastMessage.parts[0].text;
     const result = await chat.sendMessage(userText);
     const responseText = result.response.text();
 
-    // ПЕРЕВІРЯЄМО, ЧИ Є В ВІДПОВІДІ БЛОК [SUMMARY_START]
+    // Проверка и отправка уведомления в Telegram при наличии лида
     const summaryMatch = responseText.match(/\[SUMMARY_START\](.*?)\[SUMMARY_END\]/s);
     if (summaryMatch) {
       const summaryJsonString = summaryMatch[1].trim();
       
-      // Відправляємо в Telegram через безкоштовний API (якщо налаштовано)
       if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
         try {
           const summary = JSON.parse(summaryJsonString);
@@ -106,7 +106,7 @@ const model = genAI.getGenerativeModel({
       }
     }
 
-    // Повертаємо чисту відповідь Джесіки на сайт
+    // Возвращаем чистый ответ Джессики на фронтенд
     const cleanResponse = responseText.replace(/\[SUMMARY_START\].*?\[SUMMARY_END\]/s, '').trim();
     res.status(200).json({ text: cleanResponse });
 
