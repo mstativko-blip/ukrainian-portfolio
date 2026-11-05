@@ -63,14 +63,14 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Missing GEMINI_API_KEY" });
     }
 
-    // Формуємо вміст із системним промптом
     const contents = [
       { role: "user", parts: [{ text: "Системна інструкція:\n" + systemPrompt }] },
       { role: "model", parts: [{ text: "Зрозуміла. Я готова виконувати роль Джесіки." }] },
       ...messages
     ];
 
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
+    // Оновлена модель на gemini-3.8-flash згідно з вимогами API
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
 
     const apiResponse = await fetch(apiUrl, {
       method: 'POST',
@@ -87,7 +87,6 @@ export default async function handler(req, res) {
 
     const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Вибачте, виникла проблема з генерацією відповіді.";
 
-    // Перевірка лідів для Telegram
     const summaryMatch = responseText.match(/\[SUMMARY_START\](.*?)\[SUMMARY_END\]/s);
     if (summaryMatch) {
       if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
