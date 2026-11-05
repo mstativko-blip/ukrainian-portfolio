@@ -70,7 +70,7 @@ export default async function handler(req, res) {
     ];
 
     // Оновлена модель на gemini-3.8-flash згідно з вимогами API
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
+const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const apiResponse = await fetch(apiUrl, {
       method: 'POST',
