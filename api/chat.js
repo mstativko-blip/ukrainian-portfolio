@@ -68,19 +68,20 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Missing GEMINI_API_KEY" });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    // Формуємо історію повідомлень для Gemini, додаючи системний промпт першим
-    const chat = model.startChat({
-      history: [
-        { role: "user", parts: [{ text: "Ти розумієш інструкцію про свій характер та місію?" }] },
-        { role: "model", parts: [{ text: systemPrompt }] },
-        ...messages
-      ],
+const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+      systemInstruction: systemPrompt 
     });
 
-    const userMessage = messages[messages.length - 1].parts[0].text;
-    const result = await chat.sendMessage(userMessage);
+    const chatHistory = messages.slice(0, -1);
+    const lastMessage = messages[messages.length - 1];
+
+    const chat = model.startChat({
+      history: chatHistory,
+    });
+
+    const userText = lastMessage.parts[0].text;
+    const result = await chat.sendMessage(userText);
     const responseText = result.response.text();
 
     // ПЕРЕВІРЯЄМО, ЧИ Є В ВІДПОВІДІ БЛОК [SUMMARY_START]
