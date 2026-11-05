@@ -69,23 +69,65 @@ export default async function handler(req, res) {
       ...messages
     ];
 
-    // Оновлена модель на gemini-3.8-flash згідно з вимогами API
-const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const model = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+  const apiUrl =
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+
+  let data;
+
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const startedAt = Date.now();
 
     const apiResponse = await fetch(apiUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents })
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey
+      },
+      body: JSON.stringify({ contents }),
+      signal: AbortSignal.timeout(10000)
     });
 
-    const data = await apiResponse.json();
+    const rawBody = await apiResponse.text();
 
-    if (!apiResponse.ok) {
-      console.error("Gemini API Error details:", JSON.stringify(data));
-      throw new Error(data.error?.message || "Gemini API return error status");
+    try {
+      data = JSON.parse(rawBody);
+    } catch {
+      data = null;
     }
 
-    const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Вибачте, виникла проблема з генерацією відповіді.";
+    console.info('Gemini request:', {
+      model,
+      attempt,
+      status: apiResponse.status,
+      durationMs: Date.now() - startedAt
+    });
+
+    if (apiResponse.ok) {
+      if (!data) {
+        throw new Error('Gemini returned an invalid JSON response');
+      }
+      break;
+    }
+
+    console.error('Gemini error:', {
+      status: apiResponse.status,
+      message: data?.error?.message || 'Non-JSON error response'
+    });
+
+    const temporaryError = [500, 502, 503, 504]
+      .includes(apiResponse.status);
+
+    if (temporaryError && attempt < 2) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      continue;
+    }
+
+    throw new Error(
+      data?.error?.message ||
+      `Gemini HTTP ${apiResponse.status}`
+    );
+  }
 
     const summaryMatch = responseText.match(/\[SUMMARY_START\](.*?)\[SUMMARY_END\]/s);
     if (summaryMatch) {
