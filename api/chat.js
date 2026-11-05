@@ -128,7 +128,15 @@ const model = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
       `Gemini HTTP ${apiResponse.status}`
     );
   }
+const responseText = (data?.candidates?.[0]?.content?.parts || [])
+  .filter(part => typeof part.text === 'string' && !part.thought)
+  .map(part => part.text)
+  .join('')
+  .trim();
 
+if (!responseText) {
+  throw new Error('Gemini returned no answer text');
+}
     const summaryMatch = responseText.match(/\[SUMMARY_START\](.*?)\[SUMMARY_END\]/s);
     if (summaryMatch) {
       if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
