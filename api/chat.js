@@ -69,7 +69,7 @@ export default async function handler(req, res) {
       ...messages
     ];
 
-  const model = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+const model = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
   const apiUrl =
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
