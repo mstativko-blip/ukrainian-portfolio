@@ -70,7 +70,7 @@ export default async function handler(req, res) {
       ...messages
     ];
 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
 
     const apiResponse = await fetch(apiUrl, {
       method: 'POST',
