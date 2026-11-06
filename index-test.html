@@ -237,6 +237,29 @@
             line-height: 1.45;
         }
 
+        .typing::after {
+            content: "";
+            display: inline-block;
+            height: 1em;
+            border-left: 1px solid currentColor;
+            vertical-align: -0.12em;
+            margin-left: 2px;
+            animation: jessica-caret 1s steps(1) infinite;
+        }
+        @keyframes jessica-caret { 50% { opacity: 0; } }
+        @media (prefers-reduced-motion: reduce) {
+            .typing::after { animation: none; }
+        }
+        .show-reply {
+            align-self: flex-start;
+            background: none;
+            border: 0;
+            color: #585b60;
+            font: inherit;
+            font-size: .8rem;
+            text-decoration: underline;
+            cursor: pointer;
+        }
         .msg-bubble.jessica {
             background: #ffd2d2;
             color: var(--charcoal);
@@ -1143,49 +1166,117 @@
         }
 
         // --- ЛОГІКА ВБУДОВАНОГО ЧАТУ ЗІ СЕРВЕРОМ НА VERCEL ---
+        let sending = false;
+        let turnsSinceEdit = 0;
+
         function appendChatMessage(container, role, text) {
             const bubble = document.createElement('div');
             bubble.className = 'msg-bubble ' + role;
             const name = document.createElement('strong');
-            name.textContent = role === 'user' ? 'Ви:' : 'Джесіка:';
-            bubble.append(name, ' ' + text);
+            name.textContent = role === 'user' ? 'Ви: ' : 'Джесіка: ';
+            const body = document.createElement('span');
+            body.textContent = text;
+            bubble.append(name, body);
             container.append(bubble);
+            container.scrollTop = container.scrollHeight;
+            return body;
         }
 
         async function sendMsg() {
             const input = document.getElementById('userInput');
-            const messagesDiv = document.getElementById('chatMessages');
+            const box = document.getElementById('chatMessages');
+            const button = input.nextElementSibling;
             const text = input.value.trim();
-
-            if (!text) return;
-
-            // Виводимо повідомлення користувача
-            appendChatMessage(messagesDiv, 'user', text);
+            if (sending || !text) return;
+            sending = true;
+            button.disabled = true;
             input.value = '';
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-            messageHistory.push({ role: "user", parts: [{ text: text }] });
+            appendChatMessage(box, 'user', text);
+            const body = appendChatMessage(box, 'jessica', '');
+            body.classList.add('typing');
+            const turn = { role: 'user', parts: [{ text }] };
 
             try {
                 const response = await fetch('https://ukrainian-portfolio.vercel.app/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ messages: messageHistory })
+                    body: JSON.stringify({ messages: [...messageHistory, turn] })
                 });
-
                 const data = await response.json();
-
-                if (data.text) {
-                    appendChatMessage(messagesDiv, 'jessica', data.text);
-                    messageHistory.push({ role: "model", parts: [{ text: data.text }] });
-                } else {
-                    appendChatMessage(messagesDiv, 'jessica', "Сталася технічна помилка. Спробуймо ще раз?");
+                if (!response.ok || typeof data.text !== 'string' || !data.text.trim()) {
+                    throw new Error('Empty or failed reply');
                 }
-            } catch (e) {
-                appendChatMessage(messagesDiv, 'jessica', "Не вдалося з'єднатися із сервером.");
-            }
 
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                // Optional author cue: [[first wording|final wording]].
+                const chunks = [];
+                let offset = 0;
+                for (const match of data.text.matchAll(/\[\[([^\[\]|\n]+)\|([^\[\]|\n]+)\]\]/g)) {
+                    chunks.push({ text: data.text.slice(offset, match.index) });
+                    chunks.push({ draft: match[1], text: match[2] });
+                    offset = match.index + match[0].length;
+                }
+                chunks.push({ text: data.text.slice(offset) });
+                const finalText = chunks.map(chunk => chunk.text).join('');
+                messageHistory.push(turn, { role: 'model', parts: [{ text: finalText }] });
+                turnsSinceEdit++;
+                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    body.textContent = finalText;
+                    return;
+                }
+
+                let skip = false;
+                const reveal = document.createElement('button');
+                reveal.type = 'button';
+                reveal.className = 'show-reply';
+                reveal.textContent = 'Показати одразу';
+                reveal.onclick = () => { skip = true; body.textContent = finalText; };
+                body.parentElement.after(reveal);
+                const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+                let shown = '';
+                function paint() {
+                    const follow = box.scrollHeight - box.scrollTop - box.clientHeight < 38;
+                    body.textContent = shown;
+                    if (follow) box.scrollTop = box.scrollHeight;
+                }
+                async function type(part) {
+                    for (const letter of part) {
+                        if (skip) return;
+                        shown += letter;
+                        paint();
+                        const delay = /[.!?…]/.test(letter) ? 125 : /[,;:]/.test(letter) ? 65 : 12;
+                        await wait(delay + Math.random() * 10);
+                    }
+                }
+                try {
+                    for (const chunk of chunks) {
+                        if (skip) break;
+                        if (chunk.draft && chunk.draft.length <= 45 && turnsSinceEdit >= 4) {
+                            turnsSinceEdit = 0;
+                            const start = shown;
+                            await type(chunk.draft);
+                            if (!skip) await wait(340);
+                            const letters = Array.from(chunk.draft);
+                            while (!skip && letters.length) {
+                                letters.pop();
+                                shown = start + letters.join('');
+                                paint();
+                                await wait(9);
+                            }
+                        }
+                        await type(chunk.text);
+                    }
+                    body.textContent = finalText;
+                } finally {
+                    reveal.remove();
+                }
+            } catch {
+                body.textContent = 'Не вдалося отримати відповідь. Спробуйте ще раз.';
+                if (!input.value) input.value = text;
+            } finally {
+                body.classList.remove('typing');
+                sending = false;
+                button.disabled = false;
+            }
         }
 
         function handleKey(e) {
