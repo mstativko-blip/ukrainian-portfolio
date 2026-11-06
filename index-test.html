@@ -183,29 +183,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            cursor: pointer;
-        }
-
-        .hint-badge {
-            position: absolute;
-            top: -15px;
-            background: var(--charcoal);
-            color: #fff;
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 6px 14px;
-            border-radius: 20px;
-            pointer-events: none;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            animation: pulseHint 2s infinite;
-            z-index: 5;
-        }
-
-        @keyframes pulseHint {
-            0% { transform: scale(1); opacity: 0.95; }
-            50% { transform: scale(1.04); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.95; }
         }
 
         /* Вбудований чат Джесіки */
@@ -752,6 +729,32 @@
             .phone-back { left: 5%; width: 150px; }
             .phone-front { right: 5%; width: 160px; }
         }
+        .slide-text-side, .chat-input-row input { min-width: 0; }
+        .msg-bubble { overflow-wrap: anywhere; flex-shrink: 0; }
+        @media (max-width: 850px) {
+            .intro-slider-card { display: flex !important; flex-direction: column; padding: 16px; gap: 16px; align-items: stretch; }
+            .intro-slider-card .slider-footer-dots {
+                order: -1; display: flex; margin: 0; padding: 4px; gap: 4px;
+                border: 0; background: #eef0f2; border-radius: 12px;
+            }
+            .slider-footer-dots .dot-btn { flex: 1; min-height: 44px; border-radius: 9px; }
+            .slide-container, .slide-container.reverse { padding: 0; gap: 12px; grid-template-columns: minmax(0,1fr); }
+            .slide-container.reverse .slide-image-side { order: -1; }
+            .slide-container.reverse .author-photo {
+                width: 76px; height: 76px; border-radius: 50%; object-fit: cover;
+                object-position: center 29%; box-shadow: none;
+            }
+            .reverse #slideHeading { text-align: center; }
+            .embedded-chat { padding: 8px; margin-top: 10px; }
+            .chat-messages-list { height: clamp(175px, 38dvh, 380px); padding: 0; }
+            .chat-input-row { gap: 5px; }
+            .chat-input-row input { font-size: 16px; padding: 8px; }
+            .chat-input-row button { min-height: 44px; padding-inline: 10px; }
+        }
+        @media (max-width: 480px) {
+            .container { padding-inline: 10px; }
+            .intro-slider-card { padding: 12px; }
+        }
     </style>
 </head>
 <body>
@@ -811,8 +814,7 @@
                 </div>
 
                 <!-- ФОТОЧАСТИНА ЗІ СВАЙП-ПОДСКАЗКОЮ -->
-                <div class="slide-image-side" onclick="toggleSlide()">
-                    <div class="hint-badge" id="hintBadge">‹ Переключити на Джесіку ›</div>
+                <div class="slide-image-side">
                     <img id="slideImg" src="https://drive.google.com/thumbnail?id=1C6bk1pV-4zzBDnaGODLGQKOXn0gGHr7I&sz=w1000" alt="Макс Статівко" class="author-photo" style="margin: 0;">
                 </div>
 
@@ -820,8 +822,8 @@
 
             <!-- Нижні міні-кнопки перемикання слайдів -->
             <div class="slider-footer-dots">
-                <button class="dot-btn active" id="btnSlide1" onclick="setSlide(1)">1. Макс</button>
-                <button class="dot-btn" id="btnSlide2" onclick="setSlide(2)">2. Джесіка</button>
+                <button class="dot-btn active" aria-pressed="true" id="btnSlide1" onclick="setSlide(1)">1. Макс</button>
+                <button class="dot-btn" aria-pressed="false" id="btnSlide2" onclick="setSlide(2)">2. Джесіка</button>
             </div>
         </section>
         
@@ -1102,10 +1104,6 @@
         let currentIntroSlide = 1;
         let messageHistory = [];
 
-        function toggleSlide() {
-            setSlide(currentIntroSlide === 1 ? 2 : 1);
-        }
-
         function setSlide(num) {
             currentIntroSlide = num;
             const container = document.getElementById('sliderBlock');
@@ -1115,11 +1113,13 @@
             const img = document.getElementById('slideImg');
             const maxActionBlock = document.getElementById('maxActionBlock');
             const chatBox = document.getElementById('jessicaChatBox');
-            const hintBadge = document.getElementById('hintBadge');
             
             const btn1 = document.getElementById('btnSlide1');
             const btn2 = document.getElementById('btnSlide2');
 
+            btn1.setAttribute('aria-pressed', String(num === 1));
+            btn2.setAttribute('aria-pressed', String(num === 2));
+            subtitle.hidden = num === 2;
             if (num === 1) {
                 // Слайд 1: Макс
                 container.classList.remove('reverse');
@@ -1136,18 +1136,13 @@
                 maxActionBlock.style.display = "block";
                 chatBox.style.display = "none";
                 
-                hintBadge.innerText = "‹ Переключити на Джесіку ›";
                 btn1.classList.add('active');
                 btn2.classList.remove('active');
             } else {
                 // Слайд 2: Джесіка
                 container.classList.add('reverse');
                 heading.innerText = "Одним словом";
-                subtitle.innerText = "Привіт, я Джесіка";
-                descContent.style.display = "block";
-                descContent.innerHTML = `
-                    <p>Я ШІ-літературний секретар Макса. Допомагаю гостям сайту сформулювати, як саме ми з ним можемо вам допомогти.</p>
-                `;
+                descContent.style.display = "none";
                 img.src = "jessica.jpeg";
                 img.alt = "Джесіка";
                 
@@ -1155,12 +1150,11 @@
                 chatBox.style.display = "block";
                 playGreeting();
                 
-                hintBadge.innerText = "‹ Повернутися до Макса ›";
                 btn2.classList.add('active');
                 btn1.classList.remove('active');
                 
                 // Фокус у поле введення для швидкого набору
-                setTimeout(() => document.getElementById('userInput').focus(), 300);
+                if (matchMedia('(min-width: 851px) and (pointer: fine)').matches) document.getElementById('userInput').focus({preventScroll: true});
             }
         }
 
