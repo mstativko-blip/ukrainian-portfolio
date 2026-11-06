@@ -257,7 +257,7 @@
             gap: 8px;
         }
 
-        .chat-input-row input {
+        .chat-input-row textarea {
             flex: 1;
             padding: 10px 14px;
             border: 1px solid #ddd;
@@ -267,7 +267,7 @@
             outline: none;
         }
 
-        .chat-input-row input:focus {
+        .chat-input-row textarea:focus {
             border-color: var(--brand-red);
         }
 
@@ -729,7 +729,7 @@
             .phone-back { left: 5%; width: 150px; }
             .phone-front { right: 5%; width: 160px; }
         }
-        .slide-text-side, .chat-input-row input { min-width: 0; }
+        .slide-text-side, .chat-input-row textarea { min-width: 0; }
         .msg-bubble { overflow-wrap: anywhere; flex-shrink: 0; }
         @media (max-width: 850px) {
             .intro-slider-card { display: flex !important; flex-direction: column; padding: 16px; gap: 16px; align-items: stretch; }
@@ -748,13 +748,24 @@
             .embedded-chat { padding: 8px; margin-top: 10px; }
             .chat-messages-list { height: clamp(175px, 38dvh, 380px); padding: 0; }
             .chat-input-row { gap: 5px; }
-            .chat-input-row input { font-size: 16px; padding: 8px; }
+            .chat-input-row textarea { font-size: 16px; padding: 8px; }
             .chat-input-row button { min-height: 44px; padding-inline: 10px; }
         }
         @media (max-width: 480px) {
             .container { padding-inline: 10px; }
             .intro-slider-card { padding: 12px; }
         }
+        .chat-input-row { align-items: flex-end; }
+        .composer-field { flex: 1; min-width: 0; position: relative; }
+        .composer-field textarea { display: block; width: 100%; line-height: 1.45; resize: none; overflow-y: hidden; }
+        .composer-field::before, .composer-field::after {
+            position: absolute; left: 1px; right: 1px; height: 14px;
+            pointer-events: none; z-index: 1;
+        }
+        .composer-field.above::before { content: ""; top: 1px; background: linear-gradient(white, transparent); }
+        .composer-field.below::after { content: ""; bottom: 1px; background: linear-gradient(transparent, white); }
+        .msg-bubble > span { white-space: pre-wrap; }
+        #chatMessages { overscroll-behavior-y: contain; overflow-anchor: none; }
     </style>
 </head>
 <body>
@@ -807,7 +818,7 @@
 
                         </div>
                         <div class="chat-input-row">
-                            <input type="text" id="userInput" placeholder="Напишіть Джессіці..." onkeypress="handleKey(event)">
+                            <div class="composer-field"><textarea rows="1" id="userInput" aria-label="Повідомлення" placeholder="Напишіть Джессіці..."></textarea></div>
                             <button onclick="sendMsg()">Надіслати</button>
                         </div>
                     </div>
@@ -1148,6 +1159,7 @@
                 
                 maxActionBlock.style.display = "none";
                 chatBox.style.display = "block";
+                resizeComposer();
                 playGreeting();
                 
                 btn2.classList.add('active');
@@ -1171,7 +1183,7 @@
             body.textContent = text;
             bubble.append(name, body);
             container.append(bubble);
-            container.scrollTop = container.scrollHeight;
+            if (followLatest) container.scrollTop = container.scrollHeight;
             return body;
         }
 
@@ -1196,7 +1208,7 @@
             body.classList.add('typing');
             let offset = 0;
             function next() {
-                const follow = box.scrollHeight - box.scrollTop - box.clientHeight < 38;
+                const follow = followLatest;
                 const letter = text[offset++];
                 body.textContent = text.slice(0, offset);
                 if (follow) box.scrollTop = box.scrollHeight;
@@ -1236,20 +1248,22 @@
             };
             card.append(preview, send, cancel);
             box.append(card);
-            box.scrollTop = box.scrollHeight;
+            if (followLatest) box.scrollTop = box.scrollHeight;
         }
 
         async function sendMsg() {
             const input = document.getElementById('userInput');
             const box = document.getElementById('chatMessages');
-            const button = input.nextElementSibling;
+            const button = input.closest('.chat-input-row').querySelector('button');
             const text = input.value.trim();
             if (sending || !text) return;
             document.getElementById('pending-lead')?.remove();
             finishGreeting();
             sending = true;
             button.disabled = true;
+            followLatest = true;
             input.value = '';
+            resizeComposer();
             appendChatMessage(box, 'user', text);
             const body = appendChatMessage(box, 'jessica', '');
             body.classList.add('typing');
@@ -1294,7 +1308,7 @@
                 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
                 let shown = '';
                 function paint() {
-                    const follow = box.scrollHeight - box.scrollTop - box.clientHeight < 38;
+                    const follow = followLatest;
                     body.textContent = shown;
                     if (follow) box.scrollTop = box.scrollHeight;
                 }
@@ -1331,7 +1345,7 @@
                 }
             } catch {
                 body.textContent = 'Не вдалося отримати відповідь. Спробуйте ще раз.';
-                if (!input.value) input.value = text;
+                if (!input.value) { input.value = text; resizeComposer(); }
             } finally {
                 body.classList.remove('typing');
                 sending = false;
@@ -1339,9 +1353,55 @@
             }
         }
 
-        function handleKey(e) {
-            if (e.key === 'Enter') sendMsg();
+        const composer = document.getElementById('userInput');
+        function updateFades() {
+            const field = composer.parentElement;
+            field.classList.toggle('above', composer.scrollTop > 1);
+            field.classList.toggle('below', composer.scrollHeight - composer.clientHeight - composer.scrollTop > 1);
         }
+        function resizeComposer() {
+            if (!composer.clientWidth) return;
+            const style = getComputedStyle(composer);
+            const borders = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
+            const padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+            const cap = Math.ceil(7 * parseFloat(style.lineHeight) + padding + borders);
+            const previous = composer.scrollTop;
+            composer.style.height = 'auto';
+            const needed = Math.ceil(composer.scrollHeight + borders);
+            composer.style.height = Math.min(cap, needed) + 'px';
+            composer.style.overflowY = needed > cap ? 'auto' : 'hidden';
+            composer.scrollTop = previous;
+            updateFades();
+        }
+        composer.addEventListener('input', resizeComposer);
+        composer.addEventListener('scroll', updateFades);
+        window.addEventListener('resize', resizeComposer);
+        composer.addEventListener('keydown', e => {
+            if (e.key !== 'Enter' || e.shiftKey || e.isComposing || e.keyCode === 229) return;
+            if (matchMedia('(pointer: coarse)').matches && !e.ctrlKey && !e.metaKey) return;
+            e.preventDefault();
+            sendMsg();
+        });
+
+        const thread = document.getElementById('chatMessages');
+        let followLatest = true;
+        let lastScroll = 0;
+        thread.addEventListener('wheel', e => {
+            if (e.deltaY < 0 && thread.scrollTop > 0) followLatest = false;
+        }, {passive: true});
+        thread.addEventListener('scroll', () => {
+            const current = thread.scrollTop;
+            if (current < lastScroll) followLatest = false;
+            if (current > lastScroll && thread.scrollHeight - thread.clientHeight - current <= 2) followLatest = true;
+            lastScroll = current;
+        }, {passive: true});
+        let touchY = 0;
+        thread.addEventListener('touchstart', e => { touchY = e.touches[0].clientY; }, {passive:true});
+        thread.addEventListener('touchmove', e => {
+            const y = e.touches[0].clientY;
+            if (y > touchY && thread.scrollTop > 0) followLatest = false;
+            touchY = y;
+        }, {passive:true});
     </script>
 </body>
 </html>
