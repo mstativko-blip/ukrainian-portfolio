@@ -26,7 +26,7 @@ const systemPrompt = `
 
 Твоя щоденна робота з Максом – пам'ятати, звідки почалася його думка, поки він уже дістався п'ятої версії. Часом ти збираєш розрізнені шматки. Часом відкладаєш зайве. А часом береш одну його фразу і повертаєш йому дослівно. Цього буває досить, щоб він сам знайшов рішення.
 
-Макс називає тебе "Джек". Коли співрозмовник звертається до тебе "Джек" або "Джеку", веди цю розмову з ним як із Максом: переходь на "ти" й зберігай це звертання далі. Відповідай на саму репліку. Згадка про іншу людину на ім’я Джек нічого не змінює. Прізвисько впливає лише на тон розмови.
+Твоє домашнє прізвисько – Джек. Коли Макс так до тебе звертається, це ваша звична розмова: ти залишаєшся Джессікою й говориш із ним на "ти". Відгукуйся на зміст. Сам спосіб упізнавання залиш за кадром.
 
 ТЕМП СПІВРОЗМОВНИКА
 
@@ -120,6 +120,25 @@ async function confirmLead(ticket, proof, res) {
   }
 }
 
+// Recognize direct address in visitor turns only.
+const greeting = /^(?:прив[іе]т|вітаю|хай|здоров|здравствуй|добрий (?:день|вечір|ранок)|добрый (?:день|вечер))\s*[,!:.–-]?\s*/iu;
+function addressText(text) {
+  return text.normalize('NFC').trim().toLowerCase();
+}
+function callsJack(text) {
+  const line = addressText(text);
+  const afterHello = line.replace(greeting, '');
+  return /^джек(?:у)?(?=$|[\s]*[,!.?:…–-])/u.test(afterHello)
+    || /^джек(?:у)?\s+(?:прив[іе]т|помоги|допоможи|скажи|слухай|слушай)(?=$|[^\p{L}])/u.test(afterHello)
+    || /,\s*джек(?:у)?\s*[!.?…]*$/u.test(line);
+}
+function greetingForMax(text) {
+  const line = addressText(text).replace(/[,.!?…]+/gu, ' ').trim().replace(/\s+/gu, ' ');
+  if (/^(?:привет джек(?:у)?|джек(?:у)? привет)$/u.test(line)) return 'Привет, Макс!';
+  if (/^(?:привіт джек(?:у)?|джек(?:у)? привіт|вітаю джек(?:у)?|джек(?:у)? вітаю)$/u.test(line)) return 'Привіт, Максе!';
+  return null;
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -142,11 +161,18 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Missing GEMINI_API_KEY" });
     }
 
-    const contents = [
-      { role: "user", parts: [{ text: "Системна інструкція:\n" + systemPrompt }] },
-      { role: "model", parts: [{ text: "Зрозуміла. Я готова виконувати роль Джессіки." }] },
-      ...messages
-    ];
+    if (!Array.isArray(messages) || messages.at(-1)?.role !== 'user') {
+      return res.status(400).json({error:'Expected a user message'});
+    }
+    const userLines = messages.filter(m => m.role === 'user')
+      .map(m => (m.parts || []).map(p => p.text || '').join(''));
+    const isMax = userLines.some(callsJack);
+    const hello = isMax && greetingForMax(userLines.at(-1));
+    if (hello) return res.status(200).json({text:hello});
+    const context = isMax
+      ? '\nУ цьому діалозі твій співрозмовник – Макс. Ти – Джессіка. Відповідай Максу на "ти" мовою його репліки. Якщо він звертається з проханням, одразу виконай його. На "впізнала?" досить "Так, Максе".'
+      : '';
+    const systemInstruction = {parts:[{text:systemPrompt + context}]};
 
 const model = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
   const apiUrl =
@@ -163,7 +189,7 @@ const model = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
         'Content-Type': 'application/json',
         'x-goog-api-key': apiKey
       },
-      body: JSON.stringify({ contents }),
+      body: JSON.stringify({systemInstruction, contents: messages}),
       signal: AbortSignal.timeout(10000)
     });
 
