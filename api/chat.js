@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
@@ -91,8 +91,34 @@ const systemPrompt = `
 }
 [SUMMARY_END]
 
-У звичайній бесіді службового блоку немає.
+Блок готує лише чернетку. Гість побачить її в чаті й окремо підтвердить кнопкою "Надіслати Максу". На звичайний треп, привітання чи саму згадку контакту блок не створюй. Не кажи, що заявку вже надіслано.
 `;
+
+function signature(ticket) {
+  return createHmac('sha256', TELEGRAM_BOT_TOKEN).update(ticket).digest();
+}
+
+async function confirmLead(ticket, proof, res) {
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return res.status(503).json({error: 'Telegram unavailable'});
+  const supplied = Buffer.from(typeof proof === 'string' ? proof : '', 'base64url');
+  if (typeof ticket !== 'string' || ticket.length > 32000 || supplied.length !== 32 ||
+      !timingSafeEqual(signature(ticket), supplied)) return res.status(400).json({error: 'Invalid draft'});
+  const {text, expires} = JSON.parse(ticket);
+  if (expires <= Date.now()) return res.status(410).json({error: 'Draft expired'});
+  try {
+    const response = await fetch('https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({chat_id: TELEGRAM_CHAT_ID, text}),
+      signal: AbortSignal.timeout(8000)
+    });
+    const result = await response.json();
+    if (!response.ok || !result.ok) return res.status(502).json({error:'Telegram rejected delivery'});
+    return res.status(200).json({sent:true});
+  } catch {
+    return res.status(502).json({error:'Delivery unconfirmed'});
+  }
+}
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -108,6 +134,7 @@ export default async function handler(req, res) {
   }
 
   try {
+    if (req.body?.action === 'confirmLead') return await confirmLead(req.body.ticket, req.body.proof, res);
     const { messages } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
 
@@ -189,26 +216,25 @@ const responseText = (data?.candidates?.[0]?.content?.parts || [])
 if (!responseText) {
   throw new Error('Gemini returned no answer text');
 }
-    const summaryMatch = responseText.match(/\[SUMMARY_START\](.*?)\[SUMMARY_END\]/s);
-    if (summaryMatch) {
-      if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
-        try {
-          const summary = JSON.parse(summaryMatch[1].trim());
-          const telegramMessage = `🔔 **Новий лід із сайту!**\n\n👤 **Клієнт:** ${summary.client_name}\n📞 **Контакт:** ${summary.contact}\n🎯 **Задача:** ${summary.task_type}\n📝 **Резюме:**\n${summary.summary}`;
-          
-          await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            chat_id: TELEGRAM_CHAT_ID,
-            text: telegramMessage,
-            parse_mode: 'Markdown'
-          });
-        } catch (tgError) {
-          console.error('Telegram Error:', tgError);
-        }
-      }
+    const marker = responseText.indexOf('[SUMMARY_START]');
+    if (marker < 0) return res.status(200).json({text: responseText});
+    const match = responseText.slice(marker).match(/^\[SUMMARY_START\]([\s\S]*?)\[SUMMARY_END\]/);
+    let draft;
+    try { draft = JSON.parse(match?.[1] || 'null'); } catch {}
+    const fields = ['client_name', 'contact', 'task_type', 'summary'];
+    if (!fields.every(key => typeof draft?.[key] === 'string' && draft[key].trim())) {
+      return res.status(200).json({text:'Не вдалося скласти заявку. Спробуймо уточнити її текст.'});
     }
-
-    const cleanResponse = responseText.replace(/\[SUMMARY_START\].*?\[SUMMARY_END\]/s, '').trim();
-    res.status(200).json({ text: cleanResponse });
+    const text = 'Заявка з сайту\n\n' + ['Ім’я', 'Контакт', 'Задача', 'Коротко'].map(
+      (label, i) => label + ': ' + draft[fields[i]].trim()
+    ).join('\n');
+    if (text.length > 4000 || !TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+      return res.status(200).json({text:'Зараз не можу підготувати заявку до надсилання.'});
+    }
+    const ticket = JSON.stringify({text, expires: Date.now() + 30 * 60 * 1000});
+    return res.status(200).json({text:'Ось заявка. Перевірте її перед надсиланням.', draft:{
+      text, ticket, proof:signature(ticket).toString('base64url')
+    }});
 
   } catch (error) {
     console.error("Error in /api/chat:", error);
