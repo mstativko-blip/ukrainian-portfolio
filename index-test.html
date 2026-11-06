@@ -801,9 +801,7 @@
                     <!-- Вбудований живий чат із Джесікою (з'являється на 2 слайді) -->
                     <div class="embedded-chat" id="jessicaChatBox">
                         <div class="chat-messages-list" id="chatMessages">
-                            <div class="msg-bubble jessica">
-                                <strong>Джесіка:</strong> Вітаю! Я ШІ-літературний секретар Макса. Допомагаю гостям сайту сформулювати, як саме ми з ним можемо вам допомогти. Про що бажаєте дізнатися?
-                            </div>
+
                         </div>
                         <div class="chat-input-row">
                             <input type="text" id="userInput" placeholder="Напишіть Джесіці..." onkeypress="handleKey(event)">
@@ -1154,7 +1152,8 @@
                 img.alt = "Джесіка";
                 
                 maxActionBlock.style.display = "none";
-                chatBox.style.display = "block"; // Активний чат одразу відкривається
+                chatBox.style.display = "block";
+                playGreeting();
                 
                 hintBadge.innerText = "‹ Повернутися до Макса ›";
                 btn2.classList.add('active');
@@ -1182,12 +1181,45 @@
             return body;
         }
 
+        let greetingState;
+        function finishGreeting() {
+            if (!greetingState) return;
+            clearTimeout(greetingState.timer);
+            greetingState.body.textContent = greetingState.text;
+            greetingState.body.classList.remove('typing');
+        }
+
+        function playGreeting() {
+            if (greetingState) return;
+            const box = document.getElementById('chatMessages');
+            const body = appendChatMessage(box, 'jessica', '');
+            const text = "Вітаю! Я ШІ-літературний секретар Макса. Допомагаю гостям сайту сформулювати, як саме ми з ним можемо вам допомогти. Про що бажаєте дізнатися?";
+            greetingState = { body, text, timer: 0 };
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                finishGreeting();
+                return;
+            }
+            body.classList.add('typing');
+            let offset = 0;
+            function next() {
+                const follow = box.scrollHeight - box.scrollTop - box.clientHeight < 38;
+                const letter = text[offset++];
+                body.textContent = text.slice(0, offset);
+                if (follow) box.scrollTop = box.scrollHeight;
+                if (offset === text.length) return finishGreeting();
+                const delay = /[.!?…]/.test(letter) ? 125 : /[,;:]/.test(letter) ? 65 : 12;
+                greetingState.timer = setTimeout(next, delay + Math.random() * 10);
+            }
+            greetingState.timer = setTimeout(next, 180);
+        }
+
         async function sendMsg() {
             const input = document.getElementById('userInput');
             const box = document.getElementById('chatMessages');
             const button = input.nextElementSibling;
             const text = input.value.trim();
             if (sending || !text) return;
+            finishGreeting();
             sending = true;
             button.disabled = true;
             input.value = '';
