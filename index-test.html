@@ -1213,12 +1213,45 @@
             greetingState.timer = setTimeout(next, 180);
         }
 
+        function showLeadDraft(box, draft) {
+            const card = document.createElement('div');
+            card.id = 'pending-lead';
+            card.className = 'msg-bubble jessica';
+            const preview = document.createElement('div');
+            preview.style.whiteSpace = 'pre-wrap';
+            preview.textContent = draft.text;
+            const send = document.createElement('button');
+            const cancel = document.createElement('button');
+            send.textContent = 'Надіслати Максу';
+            cancel.textContent = 'Скасувати';
+            cancel.onclick = () => { card.textContent = 'Заявку скасовано.'; card.removeAttribute('id'); };
+            send.onclick = async () => {
+                send.disabled = cancel.disabled = true;
+                card.removeAttribute('id');
+                send.textContent = 'Надсилаю…';
+                let status = 'Доставку не підтверджено.';
+                try {
+                    const r = await fetch('https://ukrainian-portfolio.vercel.app/api/chat', {
+                        method:'POST', headers:{'Content-Type':'application/json'},
+                        body:JSON.stringify({action:'confirmLead', ticket:draft.ticket, proof:draft.proof})
+                    });
+                    if (r.ok && (await r.json()).sent === true) status = 'Заявку надіслано Максу.';
+                    if (r.status === 410) status = 'Час підтвердження минув. Попросіть підготувати заявку ще раз.';
+                } catch {}
+                card.replaceChildren(preview, document.createTextNode(status));
+            };
+            card.append(preview, send, cancel);
+            box.append(card);
+            box.scrollTop = box.scrollHeight;
+        }
+
         async function sendMsg() {
             const input = document.getElementById('userInput');
             const box = document.getElementById('chatMessages');
             const button = input.nextElementSibling;
             const text = input.value.trim();
             if (sending || !text) return;
+            document.getElementById('pending-lead')?.remove();
             finishGreeting();
             sending = true;
             button.disabled = true;
@@ -1235,6 +1268,7 @@
                     body: JSON.stringify({ messages: [...messageHistory, turn] })
                 });
                 const data = await response.json();
+                if (response.ok && data.draft) showLeadDraft(box, data.draft);
                 if (!response.ok || typeof data.text !== 'string' || !data.text.trim()) {
                     throw new Error('Empty or failed reply');
                 }
