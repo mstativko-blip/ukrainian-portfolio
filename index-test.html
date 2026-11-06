@@ -238,16 +238,16 @@
         }
 
         .msg-bubble.jessica {
-            background: #f0f2f5;
+            background: #ffd2d2;
             color: var(--charcoal);
             align-self: flex-start;
             border-bottom-left-radius: 2px;
         }
 
         .msg-bubble.user {
-            background: var(--brand-red);
+            background: #f0f2f5;
             color: var(--charcoal);
-            font-weight: 600;
+            font-weight: 400;
             align-self: flex-end;
             border-bottom-right-radius: 2px;
         }
@@ -779,7 +779,7 @@
                     <div class="embedded-chat" id="jessicaChatBox">
                         <div class="chat-messages-list" id="chatMessages">
                             <div class="msg-bubble jessica">
-                                Вітаю! Я ШІ-літературний секретар Макса. Допомагаю гостям сайту сформулювати, як саме ми з ним можемо вам допомогти. Про що бажаєте дізнатися?
+                                <strong>Джесіка:</strong> Вітаю! Я ШІ-літературний секретар Макса. Допомагаю гостям сайту сформулювати, як саме ми з ним можемо вам допомогти. Про що бажаєте дізнатися?
                             </div>
                         </div>
                         <div class="chat-input-row">
@@ -1143,6 +1143,15 @@
         }
 
         // --- ЛОГІКА ВБУДОВАНОГО ЧАТУ ЗІ СЕРВЕРОМ НА VERCEL ---
+        function appendChatMessage(container, role, text) {
+            const bubble = document.createElement('div');
+            bubble.className = 'msg-bubble ' + role;
+            const name = document.createElement('strong');
+            name.textContent = role === 'user' ? 'Ви:' : 'Джесіка:';
+            bubble.append(name, ' ' + text);
+            container.append(bubble);
+        }
+
         async function sendMsg() {
             const input = document.getElementById('userInput');
             const messagesDiv = document.getElementById('chatMessages');
@@ -1151,7 +1160,7 @@
             if (!text) return;
 
             // Виводимо повідомлення користувача
-            messagesDiv.innerHTML += `<div class="msg-bubble user">Ви: ${text}</div>`;
+            appendChatMessage(messagesDiv, 'user', text);
             input.value = '';
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
@@ -1167,13 +1176,13 @@
                 const data = await response.json();
 
                 if (data.text) {
-                    messagesDiv.innerHTML += `<div class="msg-bubble jessica">Джесіка: ${data.text}</div>`;
+                    appendChatMessage(messagesDiv, 'jessica', data.text);
                     messageHistory.push({ role: "model", parts: [{ text: data.text }] });
                 } else {
-                    messagesDiv.innerHTML += `<div class="msg-bubble jessica">Джесіка: Сталася технічна помилка. Спробуймо ще раз?</div>`;
+                    appendChatMessage(messagesDiv, 'jessica', "Сталася технічна помилка. Спробуймо ще раз?");
                 }
             } catch (e) {
-                messagesDiv.innerHTML += `<div class="msg-bubble jessica">Джесіка: Не вдалося з'єднатися із сервером.</div>`;
+                appendChatMessage(messagesDiv, 'jessica', "Не вдалося з'єднатися із сервером.");
             }
 
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
