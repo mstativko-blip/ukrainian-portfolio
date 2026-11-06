@@ -185,7 +185,7 @@
             align-items: center;
         }
 
-        /* Вбудований чат Джесіки */
+        /* Вбудований чат Джессіки */
         .embedded-chat {
             display: none;
             background: #ffffff;
@@ -783,11 +783,11 @@
     <main class="container">
 
 
-        <!-- 2. БЛОК 01: ІНТЕРАКТИВНИЙ СЛАЙДЕР (Макс / Джесіка + Чат) -->
+        <!-- 2. БЛОК 01: ІНТЕРАКТИВНИЙ СЛАЙДЕР (Макс / Джессіка + Чат) -->
         <section class="paper-card intro-slider-card">
             <div class="slide-container" id="sliderBlock">
                 
-                <!-- ТЕКСТОВА ЧАСТИНА (Зліва для Макса, справа для Джесіки) -->
+                <!-- ТЕКСТОВА ЧАСТИНА (Зліва для Макса, справа для Джессіки) -->
                 <div class="slide-text-side">
                     <h2 id="slideHeading">Одним словом</h2>
                     <div class="subtitle" id="slideSubtitle">Привіт, я Макс Статівко</div>
@@ -801,13 +801,13 @@
                         <button class="btn" onclick="openModal('resumeModal')">Резюме</button>
                     </div>
 
-                    <!-- Вбудований живий чат із Джесікою (з'являється на 2 слайді) -->
+                    <!-- Вбудований живий чат із Джессікою (з'являється на 2 слайді) -->
                     <div class="embedded-chat" id="jessicaChatBox">
                         <div class="chat-messages-list" id="chatMessages">
 
                         </div>
                         <div class="chat-input-row">
-                            <input type="text" id="userInput" placeholder="Напишіть Джесіці..." onkeypress="handleKey(event)">
+                            <input type="text" id="userInput" placeholder="Напишіть Джессіці..." onkeypress="handleKey(event)">
                             <button onclick="sendMsg()">Надіслати</button>
                         </div>
                     </div>
@@ -823,7 +823,7 @@
             <!-- Нижні міні-кнопки перемикання слайдів -->
             <div class="slider-footer-dots">
                 <button class="dot-btn active" aria-pressed="true" id="btnSlide1" onclick="setSlide(1)">1. Макс</button>
-                <button class="dot-btn" aria-pressed="false" id="btnSlide2" onclick="setSlide(2)">2. Джесіка</button>
+                <button class="dot-btn" aria-pressed="false" id="btnSlide2" onclick="setSlide(2)">2. Джессіка</button>
             </div>
         </section>
         
@@ -1100,7 +1100,7 @@
             }
         };
 
-        // --- ЛОГІКА ІНТЕРАКТИВНОГО СЛАЙДЕРА МАКС / ДЖЕСІКА ---
+        // --- ЛОГІКА ІНТЕРАКТИВНОГО СЛАЙДЕРА МАКС / ДЖЕССІКА ---
         let currentIntroSlide = 1;
         let messageHistory = [];
 
@@ -1139,12 +1139,12 @@
                 btn1.classList.add('active');
                 btn2.classList.remove('active');
             } else {
-                // Слайд 2: Джесіка
+                // Слайд 2: Джессіка
                 container.classList.add('reverse');
                 heading.innerText = "Одним словом";
                 descContent.style.display = "none";
                 img.src = "jessica.jpeg";
-                img.alt = "Джесіка";
+                img.alt = "Джессіка";
                 
                 maxActionBlock.style.display = "none";
                 chatBox.style.display = "block";
@@ -1166,7 +1166,7 @@
             const bubble = document.createElement('div');
             bubble.className = 'msg-bubble ' + role;
             const name = document.createElement('strong');
-            name.textContent = role === 'user' ? 'Ви: ' : 'Джесіка: ';
+            name.textContent = role === 'user' ? 'Ви: ' : 'Джессіка: ';
             const body = document.createElement('span');
             body.textContent = text;
             bubble.append(name, body);
