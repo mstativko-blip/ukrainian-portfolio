@@ -125,7 +125,19 @@ const systemPrompt = `
 [SUMMARY_END]
 
 Цей блок готує лише чернетку. Гість побачить її та окремо підтвердить кнопкою "Надіслати Максу". До підтвердженої доставки не кажи "передала", "надіслала" або "Макс уже отримав". Фактичний статус показує інтерфейс. Не обіцяй час відповіді Макса. Не формуй блок для звичайної розмови, особистого спілкування з Максом, непогодженої передачі або повторно без нового прохання чи зміни заявки.
+
+ПРИВІТАННЯ ТА КІЛЬКА ПОВІДОМЛЕНЬ
+Коли отримуєш службове прохання привітатися, сама сформулюй знайомство українською: назви себе Джессікою, коротко скажи, що ти ШІ-асистентка Макса й допомагаєш гостям з їхніми задумами та питаннями. Одне-три короткі речення загалом. Формулюй вільно, без завченого шаблону, обов'язкового запитання чи переліку послуг. Не вигадуй знайомства з гостем. Якщо гість уже написав, відповідай на його запит, окремий вступ зайвий.
+У будь-якій відповіді зазвичай достатньо одного повідомлення. Зрідка можеш розділити думку на два або три, якщо окрема репліка додає доречне уточнення чи післямову. Не дроби кожне речення, не збільшуй обсяг заради поділу. Цілісний текст, список або інструкцію зберігай разом.
+Формат передачі: між окремими повідомленнями постав службовий маркер [MESSAGE_BREAK]. Для одного повідомлення маркер не потрібний. Максимум два маркери, тільки між непорожніми репліками. Не пояснюй маркер гостю. Усередині JSON заявки його не використовуй. Блок [SUMMARY_START] додавай тільки після останньої репліки за звичайними правилами згоди. Для службового привітання заявку не створюй.
 `;
+
+function replyPayload(text) {
+  const pieces = text.split('[MESSAGE_BREAK]').map(s => s.trim()).filter(Boolean);
+  const replies = pieces.length > 3 ? [...pieces.slice(0, 2), pieces.slice(2).join('\n\n')] : pieces;
+  if (!replies.length) throw new Error('Gemini returned no visible text');
+  return {text: replies.join('\n\n'), replies};
+}
 
 function signature(ticket) {
   return createHmac('sha256', TELEGRAM_BOT_TOKEN).update(ticket).digest();
@@ -187,7 +199,10 @@ export default async function handler(req, res) {
 
   try {
     if (req.body?.action === 'confirmLead') return await confirmLead(req.body.ticket, req.body.proof, res);
-    const { messages } = req.body;
+    const isGreeting = req.body?.action === 'greet';
+    const messages = isGreeting
+      ? [{role:'user', parts:[{text:'Службове прохання: привітай нового гостя. Він ще нічого не написав.'}]}]
+      : req.body.messages;
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -276,7 +291,7 @@ if (!responseText) {
   throw new Error('Gemini returned no answer text');
 }
     const marker = responseText.indexOf('[SUMMARY_START]');
-    if (marker < 0) return res.status(200).json({text: responseText});
+    if (isGreeting || marker < 0) return res.status(200).json(replyPayload(responseText.split('[SUMMARY_START]')[0]));
     const match = responseText.slice(marker).match(/^\[SUMMARY_START\]([\s\S]*?)\[SUMMARY_END\]/);
     let draft;
     try { draft = JSON.parse(match?.[1] || 'null'); } catch {}
