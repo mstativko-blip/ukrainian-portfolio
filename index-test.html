@@ -1187,36 +1187,111 @@
             return body;
         }
 
-        let greetingState;
-        function finishGreeting() {
-            if (!greetingState) return;
-            clearTimeout(greetingState.timer);
-            greetingState.body.textContent = greetingState.text;
-            greetingState.body.classList.remove('typing');
+        const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
+        const cleanCue = text => text.replace(/\[\[([^\[\]|\n]+)\|([^\[\]|\n]+)\]\]/g, '$2');
+        function replyList(data) {
+            const items = Array.isArray(data.replies) ? data.replies : [data.text];
+            const valid = items.filter(s => typeof s === 'string' && s.trim());
+            if (!valid.length) throw new Error('Empty reply');
+            return valid.length > 3 ? [...valid.slice(0, 2), valid.slice(2).join('\n\n')] : valid;
         }
-
-        function playGreeting() {
-            if (greetingState) return;
-            const box = document.getElementById('chatMessages');
-            const body = appendChatMessage(box, 'jessica', '');
-            const text = "Вітаю! Я ШІ-літературний секретар Макса. Допомагаю гостям сайту сформулювати, як саме ми з ним можемо вам допомогти. Про що бажаєте дізнатися?";
-            greetingState = { body, text, timer: 0 };
-            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                finishGreeting();
+        async function animateReply(box, body, text, state) {
+            const finalText = cleanCue(text);
+            const chunks = [];
+            let offset = 0;
+            for (const match of text.matchAll(/\[\[([^\[\]|\n]+)\|([^\[\]|\n]+)\]\]/g)) {
+                chunks.push({text:text.slice(offset, match.index)});
+                chunks.push({draft:match[1], text:match[2]});
+                offset = match.index + match[0].length;
+            }
+            chunks.push({text:text.slice(offset)});
+            if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                if (!state.cancelled) body.textContent = finalText;
+                body.classList.remove('typing');
                 return;
             }
+            let skip = false, shown = '';
+            const reveal = document.createElement('button');
+            reveal.type = 'button'; reveal.className = 'show-reply';
+            reveal.textContent = 'Показати одразу';
+            reveal.onclick = () => { skip = true; if (!state.cancelled) body.textContent = finalText; };
+            body.parentElement.after(reveal);
             body.classList.add('typing');
-            let offset = 0;
-            function next() {
-                const follow = followLatest;
-                const letter = text[offset++];
-                body.textContent = text.slice(0, offset);
-                if (follow) box.scrollTop = box.scrollHeight;
-                if (offset === text.length) return finishGreeting();
-                const delay = /[.!?…]/.test(letter) ? 125 : /[,;:]/.test(letter) ? 65 : 12;
-                greetingState.timer = setTimeout(next, delay + Math.random() * 10);
+            function paint() {
+                if (state.cancelled || skip) return;
+                body.textContent = shown;
+                if (followLatest) box.scrollTop = box.scrollHeight;
             }
-            greetingState.timer = setTimeout(next, 180);
+            async function type(value) {
+                for (const letter of value) {
+                    if (state.cancelled || skip) return;
+                    shown += letter; paint();
+                    await pause((/[.!?…]/.test(letter) ? 125 : /[,;:]/.test(letter) ? 65 : 12) + Math.random()*10);
+                }
+            }
+            try {
+                for (const chunk of chunks) {
+                    if (state.cancelled || skip) break;
+                    if (chunk.draft && chunk.draft.length <= 45 && turnsSinceEdit >= 4 && !state.greeting) {
+                        turnsSinceEdit = 0;
+                        const start = shown;
+                        await type(chunk.draft);
+                        if (!state.cancelled && !skip) await pause(340);
+                        const letters = Array.from(chunk.draft);
+                        while (!state.cancelled && !skip && letters.length) {
+                            letters.pop(); shown = start + letters.join(''); paint(); await pause(9);
+                        }
+                    }
+                    await type(chunk.text);
+                }
+                if (!state.cancelled) body.textContent = finalText;
+            } finally { reveal.remove(); body.classList.remove('typing'); }
+        }
+        let greetingState;
+        function finishGreeting() {
+            const state = greetingState;
+            if (!state || state.done || state.cancelled) return;
+            state.cancelled = true;
+            state.controller.abort();
+            if (state.body) {
+                state.body.classList.remove('typing');
+                // Keep only what the visitor actually saw; discard unsent bubbles.
+                const visible = state.body.textContent.trim();
+                if (visible) state.seen.push(visible);
+                else state.body.parentElement.remove();
+            }
+            if (state.seen.length) messageHistory.push({role:'model', parts:[{text:state.seen.join('\n\n')}]});
+        }
+        async function playGreeting() {
+            if (greetingState || messageHistory.length) return;
+            const box = document.getElementById('chatMessages');
+            const state = greetingState = {controller:new AbortController(), cancelled:false, done:false, greeting:true, seen:[], body:null};
+            state.body = appendChatMessage(box, 'jessica', '');
+            state.body.classList.add('typing');
+            let replies;
+            const timeout = setTimeout(() => state.controller.abort(), 22000);
+            try {
+                const response = await fetch('https://ukrainian-portfolio.vercel.app/api/chat', {
+                    method:'POST', headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({action:'greet'}), signal:state.controller.signal
+                });
+                if (!response.ok) throw new Error('Greeting failed');
+                replies = replyList(await response.json());
+            } catch {
+                replies = ['Привіт, я Джессіка, ШІ-асистентка Макса. Допоможу розібратися з Вашим задумом або питанням.'];
+            } finally { clearTimeout(timeout); }
+            if (state.cancelled) return;
+            for (let i=0; i<replies.length; i++) {
+                if (state.cancelled) return;
+                if (i) state.body = appendChatMessage(box, 'jessica', '');
+                await animateReply(box, state.body, replies[i], state);
+                if (state.cancelled) return;
+                state.seen.push(cleanCue(replies[i]));
+                state.body = null;
+                if (i < replies.length-1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) await pause(350);
+            }
+            state.done = true;
+            messageHistory.push({role:'model', parts:[{text:state.seen.join('\n\n')}]});
         }
 
         function showLeadDraft(box, draft) {
@@ -1276,73 +1351,17 @@
                     body: JSON.stringify({ messages: [...messageHistory, turn] })
                 });
                 const data = await response.json();
-                if (response.ok && data.draft) showLeadDraft(box, data.draft);
-                if (!response.ok || typeof data.text !== 'string' || !data.text.trim()) {
-                    throw new Error('Empty or failed reply');
-                }
-
-                // Optional author cue: [[first wording|final wording]].
-                const chunks = [];
-                let offset = 0;
-                for (const match of data.text.matchAll(/\[\[([^\[\]|\n]+)\|([^\[\]|\n]+)\]\]/g)) {
-                    chunks.push({ text: data.text.slice(offset, match.index) });
-                    chunks.push({ draft: match[1], text: match[2] });
-                    offset = match.index + match[0].length;
-                }
-                chunks.push({ text: data.text.slice(offset) });
-                const finalText = chunks.map(chunk => chunk.text).join('');
-                messageHistory.push(turn, { role: 'model', parts: [{ text: finalText }] });
+                if (!response.ok) throw new Error('Reply failed');
+                const replies = replyList(data);
+                messageHistory.push(turn, {role:'model', parts:[{text:replies.map(cleanCue).join('\n\n')}]});
                 turnsSinceEdit++;
-                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                    body.textContent = finalText;
-                    return;
+                const state = {cancelled:false};
+                for (let i=0; i<replies.length; i++) {
+                    const target = i ? appendChatMessage(box, 'jessica', '') : body;
+                    await animateReply(box, target, replies[i], state);
+                    if (i < replies.length-1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) await pause(350);
                 }
-
-                let skip = false;
-                const reveal = document.createElement('button');
-                reveal.type = 'button';
-                reveal.className = 'show-reply';
-                reveal.textContent = 'Показати одразу';
-                reveal.onclick = () => { skip = true; body.textContent = finalText; };
-                body.parentElement.after(reveal);
-                const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-                let shown = '';
-                function paint() {
-                    const follow = followLatest;
-                    body.textContent = shown;
-                    if (follow) box.scrollTop = box.scrollHeight;
-                }
-                async function type(part) {
-                    for (const letter of part) {
-                        if (skip) return;
-                        shown += letter;
-                        paint();
-                        const delay = /[.!?…]/.test(letter) ? 125 : /[,;:]/.test(letter) ? 65 : 12;
-                        await wait(delay + Math.random() * 10);
-                    }
-                }
-                try {
-                    for (const chunk of chunks) {
-                        if (skip) break;
-                        if (chunk.draft && chunk.draft.length <= 45 && turnsSinceEdit >= 4) {
-                            turnsSinceEdit = 0;
-                            const start = shown;
-                            await type(chunk.draft);
-                            if (!skip) await wait(340);
-                            const letters = Array.from(chunk.draft);
-                            while (!skip && letters.length) {
-                                letters.pop();
-                                shown = start + letters.join('');
-                                paint();
-                                await wait(9);
-                            }
-                        }
-                        await type(chunk.text);
-                    }
-                    body.textContent = finalText;
-                } finally {
-                    reveal.remove();
-                }
+                if (data.draft) showLeadDraft(box, data.draft);
             } catch {
                 body.textContent = 'Не вдалося отримати відповідь. Спробуйте ще раз.';
                 if (!input.value) { input.value = text; resizeComposer(); }
